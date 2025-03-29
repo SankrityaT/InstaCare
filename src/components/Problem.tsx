@@ -1,4 +1,6 @@
 
+'use client';
+
 import React from 'react';
 import { AlertCircle, Clock, UserX, Activity, TrendingUp } from "lucide-react";
 

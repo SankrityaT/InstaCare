@@ -1,4 +1,6 @@
 
+'use client';
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +27,11 @@ const SignUpForm = () => {
     // Here you would typically submit to an API
     console.log('Submitted email:', email);
     
-    toast({
-      title: "Thank you for signing up!",
-      description: "We'll keep you updated on our launch.",
-    });
-    
     setSubmitted(true);
+    toast({
+      title: "Success!",
+      description: "You've been added to our waitlist.",
+    });
   };
 
   return (

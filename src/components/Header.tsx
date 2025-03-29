@@ -1,4 +1,6 @@
 
+'use client';
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Clock, AlertCircle } from "lucide-react";
