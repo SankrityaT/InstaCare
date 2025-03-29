@@ -118,13 +118,13 @@ export default function HospitalsPage() {
       
       const data = await response.json();
       
-      // Add coordinates to each hospital
+      // Add coordinates to each hospital - but don't generate random ones
       const hospitalsWithCoords = data.hospitals.map((hospital: Hospital) => ({
         ...hospital,
         coordinates: hospitalCoordinates[hospital.id] || { 
-          // Default to hospital's actual location if we don't have coordinates
-          lat: latitude + (Math.random() - 0.5) * 0.1, 
-          lng: longitude + (Math.random() - 0.5) * 0.1 
+          // Use null coordinates instead of random ones
+          lat: 0, 
+          lng: 0 
         }
       }));
       
@@ -291,7 +291,9 @@ export default function HospitalsPage() {
   const getDirections = (hospital: HospitalWithCoords) => {
     if (!userLocation) return;
     
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${hospital.coordinates.lat},${hospital.coordinates.lng}&travelmode=driving`;
+    // Use the hospital name and region for a more accurate search
+    const searchQuery = encodeURIComponent(`${hospital.name}, ${hospital.region}`);
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${searchQuery}&travelmode=driving`;
     window.open(url, '_blank');
   };
 
