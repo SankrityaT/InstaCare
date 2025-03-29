@@ -1,0 +1,386 @@
+[
+  {
+    "id": "NYC-1",
+    "name": "Harlem Hospital Center",
+    "region": "New York NY",
+    "facilitySize": 272,
+    "averageWaitTimes": {
+      "overall": 122.6,
+      "byUrgency": {
+        "Critical": 25,
+        "High": 78,
+        "Medium": 150,
+        "Low": 210
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 150,
+        "Evening": 78,
+        "Night": 210
+      },
+      "bySeason": {
+        "Winter": 122.6,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.5,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3.2,
+    "visitCount": 5
+  },
+  {
+    "id": "NYC-2",
+    "name": "Metropolitan Hospital Center",
+    "region": "New York NY",
+    "facilitySize": 338,
+    "averageWaitTimes": {
+      "overall": 141,
+      "byUrgency": {
+        "Critical": 33,
+        "High": 92,
+        "Medium": 175,
+        "Low": 230
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 175,
+        "Evening": 92,
+        "Night": 230
+      },
+      "bySeason": {
+        "Winter": 141,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.2,
+    "specialistAvailability": 5,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "NYC-3",
+    "name": "Bellevue Hospital Center",
+    "region": "New York NY",
+    "facilitySize": 847,
+    "averageWaitTimes": {
+      "overall": 173,
+      "byUrgency": {
+        "Critical": 40,
+        "High": 105,
+        "Medium": 220,
+        "Low": 280
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 220,
+        "Evening": 105,
+        "Night": 280
+      },
+      "bySeason": {
+        "Winter": 173,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "NYC-4",
+    "name": "Mount Sinai St Luke's Roosevelt Hospital",
+    "region": "New York NY",
+    "facilitySize": 523,
+    "averageWaitTimes": {
+      "overall": 225,
+      "byUrgency": {
+        "Critical": 55,
+        "High": 140,
+        "Medium": 290,
+        "Low": 350
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 290,
+        "Evening": 140,
+        "Night": 350
+      },
+      "bySeason": {
+        "Winter": 225,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 2.8,
+    "specialistAvailability": 5,
+    "patientSatisfaction": 2.4,
+    "visitCount": 5
+  },
+  {
+    "id": "NYC-5",
+    "name": "New York-Presbyterian Hospital",
+    "region": "New York NY",
+    "facilitySize": 2678,
+    "averageWaitTimes": {
+      "overall": 204.8,
+      "byUrgency": {
+        "Critical": 46,
+        "High": 128,
+        "Medium": 260,
+        "Low": 330
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 260,
+        "Evening": 128,
+        "Night": 330
+      },
+      "bySeason": {
+        "Winter": 204.8,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.1,
+    "specialistAvailability": 7,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "NYC-6",
+    "name": "Mount Sinai Hospital",
+    "region": "New York NY",
+    "facilitySize": 1134,
+    "averageWaitTimes": {
+      "overall": 196.4,
+      "byUrgency": {
+        "Critical": 42,
+        "High": 120,
+        "Medium": 250,
+        "Low": 320
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 250,
+        "Evening": 120,
+        "Night": 320
+      },
+      "bySeason": {
+        "Winter": 196.4,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.2,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "PHX-1",
+    "name": "Banner University Medical Center Phoenix",
+    "region": "Phoenix AZ",
+    "facilitySize": 733,
+    "averageWaitTimes": {
+      "overall": 167,
+      "byUrgency": {
+        "Critical": 35,
+        "High": 100,
+        "Medium": 210,
+        "Low": 280
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 210,
+        "Evening": 100,
+        "Night": 280
+      },
+      "bySeason": {
+        "Winter": 167,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.2,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "PHX-2",
+    "name": "Mayo Clinic Hospital",
+    "region": "Phoenix AZ",
+    "facilitySize": 268,
+    "averageWaitTimes": {
+      "overall": 131.6,
+      "byUrgency": {
+        "Critical": 28,
+        "High": 80,
+        "Medium": 160,
+        "Low": 230
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 160,
+        "Evening": 80,
+        "Night": 230
+      },
+      "bySeason": {
+        "Winter": 131.6,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.8,
+    "specialistAvailability": 7,
+    "patientSatisfaction": 4,
+    "visitCount": 5
+  },
+  {
+    "id": "PHX-3",
+    "name": "St. Joseph's Hospital And Medical Center",
+    "region": "Phoenix AZ",
+    "facilitySize": 595,
+    "averageWaitTimes": {
+      "overall": 154.4,
+      "byUrgency": {
+        "Critical": 32,
+        "High": 90,
+        "Medium": 195,
+        "Low": 260
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 195,
+        "Evening": 90,
+        "Night": 260
+      },
+      "bySeason": {
+        "Winter": 154.4,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.4,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3.2,
+    "visitCount": 5
+  },
+  {
+    "id": "LON-1",
+    "name": "St. Thomas' Hospital",
+    "region": "London UK",
+    "facilitySize": 840,
+    "averageWaitTimes": {
+      "overall": 182,
+      "byUrgency": {
+        "Critical": 40,
+        "High": 110,
+        "Medium": 230,
+        "Low": 300
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 230,
+        "Evening": 110,
+        "Night": 300
+      },
+      "bySeason": {
+        "Winter": 182,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.3,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "LON-2",
+    "name": "Royal London Hospital",
+    "region": "London UK",
+    "facilitySize": 675,
+    "averageWaitTimes": {
+      "overall": 194.2,
+      "byUrgency": {
+        "Critical": 46,
+        "High": 120,
+        "Medium": 245,
+        "Low": 315
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 245,
+        "Evening": 120,
+        "Night": 315
+      },
+      "bySeason": {
+        "Winter": 194.2,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.1,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  },
+  {
+    "id": "LON-3",
+    "name": "University College Hospital",
+    "region": "London UK",
+    "facilitySize": 665,
+    "averageWaitTimes": {
+      "overall": 171.4,
+      "byUrgency": {
+        "Critical": 37,
+        "High": 105,
+        "Medium": 215,
+        "Low": 285
+      },
+      "byTimeOfDay": {
+        "Early Morning": 0,
+        "Late Morning": 0,
+        "Afternoon": 215,
+        "Evening": 105,
+        "Night": 285
+      },
+      "bySeason": {
+        "Winter": 171.4,
+        "Spring": 0,
+        "Summer": 0,
+        "Fall": 0
+      }
+    },
+    "nurseToPatientRatio": 3.4,
+    "specialistAvailability": 6,
+    "patientSatisfaction": 3,
+    "visitCount": 5
+  }
+]

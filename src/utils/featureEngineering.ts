@@ -174,7 +174,9 @@ async function featureEngineerCSV(filePath: string): Promise<{
 async function saveProcessedData(
   processedVisits: ProcessedVisit[],
   hospitalFeatures: HospitalFeatures[],
-  outputDir: string
+  outputDir: string,
+  visitsFileName: string = 'processed-visits.json',
+  hospitalFeaturesFileName: string = 'hospital-features.json'
 ): Promise<void> {
   // Ensure the output directory exists
   if (!fs.existsSync(outputDir)) {
@@ -183,13 +185,13 @@ async function saveProcessedData(
   
   // Save processed visits
   fs.writeFileSync(
-    path.join(outputDir, 'processed-visits.json'),
+    path.join(outputDir, visitsFileName),
     JSON.stringify(processedVisits, null, 2)
   );
   
   // Save hospital features
   fs.writeFileSync(
-    path.join(outputDir, 'hospital-features.json'),
+    path.join(outputDir, hospitalFeaturesFileName),
     JSON.stringify(hospitalFeatures, null, 2)
   );
 }

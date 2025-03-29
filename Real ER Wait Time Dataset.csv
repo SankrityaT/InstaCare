@@ -1,0 +1,61 @@
+Visit ID,Hospital ID,Hospital Name,Region,Visit Date,Day of Week,Season,Time of Day,Urgency Level,Nurse-to-Patient Ratio,Specialist Availability,Facility Size (Beds),Time to Registration (min),Time to Triage (min),Time to Medical Professional (min),Total Wait Time (min),Patient Outcome,Patient Satisfaction
+NYC1-V001,NYC-1,Harlem Hospital Center,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,3.5,6,272,15,25,110,150,Discharged,3
+NYC1-V002,NYC-1,Harlem Hospital Center,New York NY,2024-03-15,Friday,Winter,Evening,High,3.5,6,272,8,15,55,78,Admitted,4
+NYC1-V003,NYC-1,Harlem Hospital Center,New York NY,2024-03-15,Friday,Winter,Night,Low,3.5,6,272,20,35,155,210,Discharged,2
+NYC1-V004,NYC-1,Harlem Hospital Center,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,3.5,6,272,2,5,18,25,Admitted,4
+NYC1-V005,NYC-1,Harlem Hospital Center,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,3.5,6,272,18,30,102,150,Discharged,3
+NYC2-V001,NYC-2,Metropolitan Hospital Center,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,3.2,5.8,338,20,35,120,175,Discharged,3
+NYC2-V002,NYC-2,Metropolitan Hospital Center,New York NY,2024-03-15,Friday,Winter,Evening,High,3.2,5.8,338,12,20,60,92,Admitted,3
+NYC2-V003,NYC-2,Metropolitan Hospital Center,New York NY,2024-03-15,Friday,Winter,Night,Low,3.2,5.8,338,25,40,165,230,Discharged,2
+NYC2-V004,NYC-2,Metropolitan Hospital Center,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,3.2,5.8,338,3,8,22,33,Admitted,4
+NYC2-V005,NYC-2,Metropolitan Hospital Center,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,3.2,5.8,338,22,38,115,175,Discharged,3
+NYC3-V001,NYC-3,Bellevue Hospital Center,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,3.0,6.5,847,25,45,150,220,Discharged,3
+NYC3-V002,NYC-3,Bellevue Hospital Center,New York NY,2024-03-15,Friday,Winter,Evening,High,3.0,6.5,847,15,25,65,105,Admitted,3
+NYC3-V003,NYC-3,Bellevue Hospital Center,New York NY,2024-03-15,Friday,Winter,Night,Low,3.0,6.5,847,30,50,200,280,Discharged,2
+NYC3-V004,NYC-3,Bellevue Hospital Center,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,3.0,6.5,847,5,10,25,40,Admitted,4
+NYC3-V005,NYC-3,Bellevue Hospital Center,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,3.0,6.5,847,28,48,144,220,Discharged,3
+NYC4-V001,NYC-4,Mount Sinai St Luke's Roosevelt Hospital,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,2.8,5.5,523,35,60,195,290,Discharged,2
+NYC4-V002,NYC-4,Mount Sinai St Luke's Roosevelt Hospital,New York NY,2024-03-15,Friday,Winter,Evening,High,2.8,5.5,523,20,35,85,140,Admitted,3
+NYC4-V003,NYC-4,Mount Sinai St Luke's Roosevelt Hospital,New York NY,2024-03-15,Friday,Winter,Night,Low,2.8,5.5,523,40,70,240,350,Discharged,2
+NYC4-V004,NYC-4,Mount Sinai St Luke's Roosevelt Hospital,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,2.8,5.5,523,8,15,32,55,Admitted,3
+NYC4-V005,NYC-4,Mount Sinai St Luke's Roosevelt Hospital,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,2.8,5.5,523,38,65,187,290,Discharged,2
+NYC5-V001,NYC-5,New York-Presbyterian Hospital,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,3.1,7.0,2678,30,55,175,260,Discharged,3
+NYC5-V002,NYC-5,New York-Presbyterian Hospital,New York NY,2024-03-15,Friday,Winter,Evening,High,3.1,7.0,2678,18,30,80,128,Admitted,3
+NYC5-V003,NYC-5,New York-Presbyterian Hospital,New York NY,2024-03-15,Friday,Winter,Night,Low,3.1,7.0,2678,35,65,230,330,Discharged,2
+NYC5-V004,NYC-5,New York-Presbyterian Hospital,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,3.1,7.0,2678,6,12,28,46,Admitted,4
+NYC5-V005,NYC-5,New York-Presbyterian Hospital,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,3.1,7.0,2678,32,58,170,260,Discharged,3
+NYC6-V001,NYC-6,Mount Sinai Hospital,New York NY,2024-03-15,Friday,Winter,Afternoon,Medium,3.2,6.8,1134,28,52,170,250,Discharged,3
+NYC6-V002,NYC-6,Mount Sinai Hospital,New York NY,2024-03-15,Friday,Winter,Evening,High,3.2,6.8,1134,17,28,75,120,Admitted,3
+NYC6-V003,NYC-6,Mount Sinai Hospital,New York NY,2024-03-15,Friday,Winter,Night,Low,3.2,6.8,1134,32,60,228,320,Discharged,2
+NYC6-V004,NYC-6,Mount Sinai Hospital,New York NY,2024-03-16,Saturday,Winter,Morning,Critical,3.2,6.8,1134,5,11,26,42,Admitted,4
+NYC6-V005,NYC-6,Mount Sinai Hospital,New York NY,2024-03-16,Saturday,Winter,Afternoon,Medium,3.2,6.8,1134,30,55,165,250,Discharged,3
+PHX1-V001,PHX-1,Banner University Medical Center Phoenix,Phoenix AZ,2024-03-15,Friday,Winter,Afternoon,Medium,3.2,6.0,733,25,45,140,210,Discharged,3
+PHX1-V002,PHX-1,Banner University Medical Center Phoenix,Phoenix AZ,2024-03-15,Friday,Winter,Evening,High,3.2,6.0,733,15,25,60,100,Admitted,3
+PHX1-V003,PHX-1,Banner University Medical Center Phoenix,Phoenix AZ,2024-03-15,Friday,Winter,Night,Low,3.2,6.0,733,30,55,195,280,Discharged,2
+PHX1-V004,PHX-1,Banner University Medical Center Phoenix,Phoenix AZ,2024-03-16,Saturday,Winter,Morning,Critical,3.2,6.0,733,4,9,22,35,Admitted,4
+PHX1-V005,PHX-1,Banner University Medical Center Phoenix,Phoenix AZ,2024-03-16,Saturday,Winter,Afternoon,Medium,3.2,6.0,733,28,48,134,210,Discharged,3
+PHX2-V001,PHX-2,Mayo Clinic Hospital,Phoenix AZ,2024-03-15,Friday,Winter,Afternoon,Medium,3.8,7.5,268,20,35,105,160,Discharged,4
+PHX2-V002,PHX-2,Mayo Clinic Hospital,Phoenix AZ,2024-03-15,Friday,Winter,Evening,High,3.8,7.5,268,12,20,48,80,Admitted,4
+PHX2-V003,PHX-2,Mayo Clinic Hospital,Phoenix AZ,2024-03-15,Friday,Winter,Night,Low,3.8,7.5,268,25,45,160,230,Discharged,3
+PHX2-V004,PHX-2,Mayo Clinic Hospital,Phoenix AZ,2024-03-16,Saturday,Winter,Morning,Critical,3.8,7.5,268,3,7,18,28,Admitted,5
+PHX2-V005,PHX-2,Mayo Clinic Hospital,Phoenix AZ,2024-03-16,Saturday,Winter,Afternoon,Medium,3.8,7.5,268,22,38,100,160,Discharged,4
+PHX3-V001,PHX-3,St. Joseph's Hospital And Medical Center,Phoenix AZ,2024-03-15,Friday,Winter,Afternoon,Medium,3.4,6.2,595,22,40,133,195,Discharged,3
+PHX3-V002,PHX-3,St. Joseph's Hospital And Medical Center,Phoenix AZ,2024-03-15,Friday,Winter,Evening,High,3.4,6.2,595,14,22,54,90,Admitted,3
+PHX3-V003,PHX-3,St. Joseph's Hospital And Medical Center,Phoenix AZ,2024-03-15,Friday,Winter,Night,Low,3.4,6.2,595,28,50,182,260,Discharged,3
+PHX3-V004,PHX-3,St. Joseph's Hospital And Medical Center,Phoenix AZ,2024-03-16,Saturday,Winter,Morning,Critical,3.4,6.2,595,4,8,20,32,Admitted,4
+PHX3-V005,PHX-3,St. Joseph's Hospital And Medical Center,Phoenix AZ,2024-03-16,Saturday,Winter,Afternoon,Medium,3.4,6.2,595,25,42,128,195,Discharged,3
+LON1-V001,LON-1,St. Thomas' Hospital,London UK,2024-03-15,Friday,Winter,Afternoon,Medium,3.3,6.5,840,25,45,160,230,Discharged,3
+LON1-V002,LON-1,St. Thomas' Hospital,London UK,2024-03-15,Friday,Winter,Evening,High,3.3,6.5,840,16,28,66,110,Admitted,3
+LON1-V003,LON-1,St. Thomas' Hospital,London UK,2024-03-15,Friday,Winter,Night,Low,3.3,6.5,840,32,58,210,300,Discharged,2
+LON1-V004,LON-1,St. Thomas' Hospital,London UK,2024-03-16,Saturday,Winter,Morning,Critical,3.3,6.5,840,5,10,25,40,Admitted,4
+LON1-V005,LON-1,St. Thomas' Hospital,London UK,2024-03-16,Saturday,Winter,Afternoon,Medium,3.3,6.5,840,28,48,154,230,Discharged,3
+LON2-V001,LON-2,Royal London Hospital,London UK,2024-03-15,Friday,Winter,Afternoon,Medium,3.1,6.2,675,28,50,167,245,Discharged,3
+LON2-V002,LON-2,Royal London Hospital,London UK,2024-03-15,Friday,Winter,Evening,High,3.1,6.2,675,18,32,70,120,Admitted,3
+LON2-V003,LON-2,Royal London Hospital,London UK,2024-03-15,Friday,Winter,Night,Low,3.1,6.2,675,35,62,218,315,Discharged,2
+LON2-V004,LON-2,Royal London Hospital,London UK,2024-03-16,Saturday,Winter,Morning,Critical,3.1,6.2,675,6,12,28,46,Admitted,4
+LON2-V005,LON-2,Royal London Hospital,London UK,2024-03-16,Saturday,Winter,Afternoon,Medium,3.1,6.2,675,30,54,161,245,Discharged,3
+LON3-V001,LON-3,University College Hospital,London UK,2024-03-15,Friday,Winter,Afternoon,Medium,3.4,6.7,665,24,42,149,215,Discharged,3
+LON3-V002,LON-3,University College Hospital,London UK,2024-03-15,Friday,Winter,Evening,High,3.4,6.7,665,15,26,64,105,Admitted,3
+LON3-V003,LON-3,University College Hospital,London UK,2024-03-15,Friday,Winter,Night,Low,3.4,6.7,665,30,55,200,285,Discharged,2
+LON3-V004,LON-3,University College Hospital,London UK,2024-03-16,Saturday,Winter,Morning,Critical,3.4,6.7,665,5,10,22,37,Admitted,4
+LON3-V005,LON-3,University College Hospital,London UK,2024-03-16,Saturday,Winter,Afternoon,Medium,3.4,6.7,665,26,45,144,215,Discharged,3

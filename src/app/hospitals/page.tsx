@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, MapPin, Clock, Search, ArrowLeft, Navigation } from "lucide-react";
 import Link from 'next/link';
+import PredictionFactors from '@/components/PredictionFactors';
 import Script from 'next/script';
 
 /// <reference types="@types/google.maps" />
@@ -16,10 +17,23 @@ interface Hospital {
   name: string;
   region: string;
   distance: number;
-  estimatedWaitTime: number;
-  patientSatisfaction: number;
-  nurseToPatientRatio: number;
   facilitySize: number;
+  nurseToPatientRatio: number;
+  patientSatisfaction: number;
+  historicalWaitTime: number;
+  prediction: {
+    predictedWaitTime: number;
+    confidenceScore: number;
+    factors: {
+      baseWaitTime: number;
+      timeOfDayFactor: number;
+      seasonFactor: number;
+      dayOfWeekFactor: number;
+      trafficFactor: number;
+      weatherFactor: number;
+      otherFactors: string[];
+    }
+  }
 }
 
 // Add coordinates to our hospital interface for mapping
@@ -82,7 +96,7 @@ export default function HospitalsPage() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/hospitals?latitude=${latitude}&longitude=${longitude}&urgency=${urgencyLevel}`
+        `/api/predict?latitude=${latitude}&longitude=${longitude}&urgency=${urgencyLevel}`
       );
       
       if (!response.ok) {
@@ -373,6 +387,80 @@ export default function HospitalsPage() {
             )}
             
             {filteredHospitals.length > 0 && (
+              <>
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold mb-2">Available Hospitals</h2>
+                  <p className="text-muted-foreground">
+                    Showing {filteredHospitals.length} hospitals from various locations. 
+                    Hospitals are sorted by distance from your current location.
+                  </p>
+                </div>
+                
+                {/* Group hospitals by region */}
+                {Object.entries(
+                  filteredHospitals.reduce((acc, hospital) => {
+                    const region = hospital.region.split(',')[0].trim();
+                    if (!acc[region]) {
+                      acc[region] = [];
+                    }
+                    acc[region].push(hospital);
+                    return acc;
+                  }, {} as Record<string, Hospital[]>)
+                ).map(([region, hospitals]) => (
+                  <div key={region} className="mb-8">
+                    <h3 className="text-lg font-medium mb-4 bg-muted p-2 rounded">
+                      {region} ({hospitals.length} hospitals)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {hospitals.map((hospital) => (
+                        <Card key={hospital.id}>
+                          <CardHeader>
+                            <CardTitle>{hospital.name}</CardTitle>
+                            <CardDescription>{hospital.region}</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Distance:</span>
+                                <span className="font-medium">{formatDistance(hospital.distance)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Estimated Wait:</span>
+                                <span className="font-medium flex items-center">
+                                  <Clock className="mr-1 h-4 w-4 text-amber-500" />
+                                  {formatWaitTime(hospital.prediction.predictedWaitTime)}
+                                  <PredictionFactors factors={hospital.prediction.factors} />
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Confidence:</span>
+                                <span className="font-medium">
+                                  {Math.round(hospital.prediction.confidenceScore * 100)}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Historical Wait:</span>
+                                <span className="font-medium">{formatWaitTime(hospital.historicalWaitTime)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Satisfaction:</span>
+                                <span className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Facility Size:</span>
+                                <span className="font-medium">{hospital.facilitySize} beds</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                          <CardFooter>
+                            <Button className="w-full">Get Directions</Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
               <div className="space-y-4">
                 {filteredHospitals.map((hospital, index) => {
                   const waitTimeCategory = getWaitTimeCategory(hospital.estimatedWaitTime);
