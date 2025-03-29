@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, MapPin, Clock, Search, ArrowLeft, Navigation } from "lucide-react";
 import Link from 'next/link';
-import PredictionFactors from '@/components/PredictionFactors';
 import Script from 'next/script';
+import PredictionFactors from '@/components/PredictionFactors';
 
 /// <reference types="@types/google.maps" />
 
@@ -44,13 +44,26 @@ interface HospitalWithCoords extends Hospital {
   };
 }
 
-// Mock hospital coordinates (in a real app, these would come from the API)
+// Hospital coordinates for mapping
 const hospitalCoordinates: Record<string, { lat: number; lng: number }> = {
-  'HOSP-1': { lat: 37.7749, lng: -122.4194 }, // San Francisco
-  'HOSP-2': { lat: 37.3382, lng: -121.8863 }, // San Jose
-  'HOSP-3': { lat: 38.5816, lng: -121.4944 }, // Sacramento
-  'HOSP-4': { lat: 36.7783, lng: -119.4179 }, // Fresno
-  'HOSP-5': { lat: 34.0522, lng: -118.2437 }  // Los Angeles
+  // San Francisco / California
+  'HOSP-1': { lat: 37.7749, lng: -122.4194 },
+  'HOSP-2': { lat: 37.3382, lng: -121.8863 },
+  'HOSP-3': { lat: 38.5816, lng: -121.4944 },
+  'HOSP-4': { lat: 36.7783, lng: -119.4179 },
+  'HOSP-5': { lat: 34.0522, lng: -118.2437 },
+  // New York
+  'NYC-1': { lat: 40.7128, lng: -74.0060 },
+  'NYC-2': { lat: 40.7589, lng: -73.9851 },
+  'NYC-3': { lat: 40.8448, lng: -73.8648 },
+  // Phoenix
+  'PHX-1': { lat: 33.4484, lng: -112.0740 },
+  'PHX-2': { lat: 33.5722, lng: -112.0891 },
+  'PHX-3': { lat: 33.3883, lng: -111.9647 },
+  // London
+  'LDN-1': { lat: 51.5074, lng: -0.1278 },
+  'LDN-2': { lat: 51.5225, lng: -0.1539 },
+  'LDN-3': { lat: 51.4700, lng: -0.1534 }
 };
 
 export default function HospitalsPage() {
@@ -108,7 +121,11 @@ export default function HospitalsPage() {
       // Add coordinates to each hospital
       const hospitalsWithCoords = data.hospitals.map((hospital: Hospital) => ({
         ...hospital,
-        coordinates: hospitalCoordinates[hospital.id] || { lat: 0, lng: 0 }
+        coordinates: hospitalCoordinates[hospital.id] || { 
+          // Default to hospital's actual location if we don't have coordinates
+          lat: latitude + (Math.random() - 0.5) * 0.1, 
+          lng: longitude + (Math.random() - 0.5) * 0.1 
+        }
       }));
       
       setHospitals(hospitalsWithCoords);
@@ -155,7 +172,7 @@ export default function HospitalsPage() {
     hospitals.forEach((hospital, index) => {
       if (hospital.coordinates.lat === 0 && hospital.coordinates.lng === 0) return;
       
-      const waitTimeCategory = getWaitTimeCategory(hospital.estimatedWaitTime);
+      const waitTimeCategory = getWaitTimeCategory(hospital.prediction.predictedWaitTime);
       const markerColor = waitTimeCategory === 'Low' ? '#4CAF50' : 
                           waitTimeCategory === 'Medium' ? '#FFC107' : '#F44336';
       
@@ -185,7 +202,7 @@ export default function HospitalsPage() {
         const contentString = `
           <div style="padding: 10px; max-width: 200px;">
             <h3 style="margin: 0 0 5px 0; font-size: 16px;">${hospital.name}</h3>
-            <p style="margin: 0 0 5px 0; font-size: 14px;">${formatWaitTime(hospital.estimatedWaitTime)} wait</p>
+            <p style="margin: 0 0 5px 0; font-size: 14px;">${formatWaitTime(hospital.prediction.predictedWaitTime)} wait</p>
             <p style="margin: 0; font-size: 12px;">${formatDistance(hospital.distance)} away</p>
           </div>
         `;
@@ -405,136 +422,100 @@ export default function HospitalsPage() {
                     }
                     acc[region].push(hospital);
                     return acc;
-                  }, {} as Record<string, Hospital[]>)
+                  }, {} as Record<string, HospitalWithCoords[]>)
                 ).map(([region, hospitals]) => (
                   <div key={region} className="mb-8">
                     <h3 className="text-lg font-medium mb-4 bg-muted p-2 rounded">
                       {region} ({hospitals.length} hospitals)
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {hospitals.map((hospital) => (
-                        <Card key={hospital.id}>
-                          <CardHeader>
-                            <CardTitle>{hospital.name}</CardTitle>
-                            <CardDescription>{hospital.region}</CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-2">
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Distance:</span>
-                                <span className="font-medium">{formatDistance(hospital.distance)}</span>
+                    <div className="grid grid-cols-1 gap-4">
+                      {hospitals.map((hospital, index) => {
+                        const waitTimeCategory = getWaitTimeCategory(hospital.prediction.predictedWaitTime);
+                        const waitTimeColor = 
+                          waitTimeCategory === 'Low' ? 'text-green-600 bg-green-50' : 
+                          waitTimeCategory === 'Medium' ? 'text-amber-600 bg-amber-50' : 
+                          'text-red-600 bg-red-50';
+                        
+                        return (
+                          <Card 
+                            key={hospital.id} 
+                            className={`border-l-4 ${
+                              selectedHospital?.id === hospital.id ? 'border-l-primary' : 'border-l-transparent'
+                            } hover:shadow-md transition-all`}
+                            onClick={() => setSelectedHospital(hospital)}
+                          >
+                            <CardHeader className="pb-2">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <div className="flex items-center">
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
+                                      {index + 1}
+                                    </div>
+                                    <CardTitle className="text-xl">{hospital.name}</CardTitle>
+                                  </div>
+                                  <CardDescription>{hospital.region}</CardDescription>
+                                </div>
+                                <div className={`px-3 py-1 rounded-full text-sm font-medium ${waitTimeColor}`}>
+                                  {waitTimeCategory} Wait
+                                </div>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Estimated Wait:</span>
-                                <span className="font-medium flex items-center">
-                                  <Clock className="mr-1 h-4 w-4 text-amber-500" />
-                                  {formatWaitTime(hospital.prediction.predictedWaitTime)}
-                                  <PredictionFactors factors={hospital.prediction.factors} />
-                                </span>
+                            </CardHeader>
+                            <CardContent className="pb-2">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Distance</p>
+                                  <p className="font-medium flex items-center">
+                                    <MapPin className="mr-1 h-4 w-4 text-slate-400" />
+                                    {formatDistance(hospital.distance)}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Wait Time</p>
+                                  <p className="font-medium flex items-center">
+                                    <Clock className="mr-1 h-4 w-4 text-slate-400" />
+                                    {formatWaitTime(hospital.prediction.predictedWaitTime)}
+                                    <PredictionFactors factors={hospital.prediction.factors} />
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Confidence</p>
+                                  <p className="font-medium">
+                                    {Math.round(hospital.prediction.confidenceScore * 100)}%
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Historical Wait</p>
+                                  <p className="font-medium">{formatWaitTime(hospital.historicalWaitTime)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Satisfaction</p>
+                                  <p className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">Facility Size</p>
+                                  <p className="font-medium">{hospital.facilitySize} beds</p>
+                                </div>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Confidence:</span>
-                                <span className="font-medium">
-                                  {Math.round(hospital.prediction.confidenceScore * 100)}%
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Historical Wait:</span>
-                                <span className="font-medium">{formatWaitTime(hospital.historicalWaitTime)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Satisfaction:</span>
-                                <span className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Facility Size:</span>
-                                <span className="font-medium">{hospital.facilitySize} beds</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                          <CardFooter>
-                            <Button className="w-full">Get Directions</Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
+                            </CardContent>
+                            <CardFooter>
+                              <Button 
+                                className="w-full" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  getDirections(hospital);
+                                }}
+                              >
+                                <Navigation className="mr-2 h-4 w-4" />
+                                Get Directions
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
               </>
-              <div className="space-y-4">
-                {filteredHospitals.map((hospital, index) => {
-                  const waitTimeCategory = getWaitTimeCategory(hospital.estimatedWaitTime);
-                  const waitTimeColor = 
-                    waitTimeCategory === 'Low' ? 'text-green-600 bg-green-50' : 
-                    waitTimeCategory === 'Medium' ? 'text-amber-600 bg-amber-50' : 
-                    'text-red-600 bg-red-50';
-                  
-                  return (
-                    <Card 
-                      key={hospital.id} 
-                      className={`border-l-4 ${
-                        selectedHospital?.id === hospital.id ? 'border-l-primary' : 'border-l-transparent'
-                      } hover:shadow-md transition-all`}
-                      onClick={() => setSelectedHospital(hospital)}
-                    >
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
-                                {index + 1}
-                              </div>
-                              <CardTitle className="text-xl">{hospital.name}</CardTitle>
-                            </div>
-                            <CardDescription>{hospital.region}</CardDescription>
-                          </div>
-                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${waitTimeColor}`}>
-                            {waitTimeCategory} Wait
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground">Distance</p>
-                            <p className="font-medium flex items-center">
-                              <MapPin className="mr-1 h-4 w-4 text-slate-400" />
-                              {formatDistance(hospital.distance)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Wait Time</p>
-                            <p className="font-medium flex items-center">
-                              <Clock className="mr-1 h-4 w-4 text-slate-400" />
-                              {formatWaitTime(hospital.estimatedWaitTime)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Satisfaction</p>
-                            <p className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Facility Size</p>
-                            <p className="font-medium">{hospital.facilitySize} beds</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter>
-                        <Button 
-                          className="w-full" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            getDirections(hospital);
-                          }}
-                        >
-                          <Navigation className="mr-2 h-4 w-4" />
-                          Get Directions
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  );
-                })}
-              </div>
             )}
             
             {userLocation && filteredHospitals.length === 0 && !loading && (
