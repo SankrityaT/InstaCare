@@ -2,6 +2,8 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Clock, ArrowRight } from "lucide-react";
+import Link from 'next/link';
+import { MapPin } from 'lucide-react';
 
 const Hero = () => {
   return (
@@ -71,9 +73,12 @@ const Hero = () => {
                     </div>
                   </div>
                 ))}
-                <Button className="w-full bg-instacare-600 hover:bg-instacare-700 mt-4">
-                  View All Nearby Hospitals
-                </Button>
+                <Link href="/hospitals">
+                  <Button className="w-full bg-instacare-600 hover:bg-instacare-700 mt-4">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    View All Nearby Hospitals
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
