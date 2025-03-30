@@ -11,7 +11,7 @@ import Script from 'next/script';
 import PredictionFactors from '@/components/PredictionFactors';
 import { Badge } from "@/components/ui/badge";
 
-/// <reference types="@types/google.maps" />
+/// <reference types="google.maps" />
 
 interface Hospital {
   id: string;
