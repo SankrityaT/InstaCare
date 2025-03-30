@@ -43,11 +43,30 @@ interface HospitalWithDistance extends HospitalFeatures {
 
 // Mock hospital coordinates (in a real app, these would come from a database)
 const hospitalCoordinates: Record<string, { lat: number; lon: number }> = {
+  // Original California hospitals
   'HOSP-1': { lat: 37.7749, lon: -122.4194 }, // San Francisco
   'HOSP-2': { lat: 37.3382, lon: -121.8863 }, // San Jose
   'HOSP-3': { lat: 38.5816, lon: -121.4944 }, // Sacramento
   'HOSP-4': { lat: 36.7783, lon: -119.4179 }, // Fresno
-  'HOSP-5': { lat: 34.0522, lon: -118.2437 }  // Los Angeles
+  'HOSP-5': { lat: 34.0522, lon: -118.2437 }, // Los Angeles
+  
+  // New York City hospitals
+  'NYC-1': { lat: 40.8142, lon: -73.9419 }, // Harlem Hospital Center
+  'NYC-2': { lat: 40.7845, lon: -73.9440 }, // Metropolitan Hospital Center
+  'NYC-3': { lat: 40.7392, lon: -73.9767 }, // Bellevue Hospital Center
+  'NYC-4': { lat: 40.8019, lon: -73.9662 }, // Mount Sinai St Luke's Roosevelt Hospital
+  'NYC-5': { lat: 40.7644, lon: -73.9552 }, // New York-Presbyterian Hospital
+  'NYC-6': { lat: 40.7900, lon: -73.9526 }, // Mount Sinai Hospital
+  
+  // Phoenix hospitals
+  'PHX-1': { lat: 33.4805, lon: -112.0741 }, // Banner University Medical Center Phoenix
+  'PHX-2': { lat: 33.6107, lon: -111.8910 }, // Mayo Clinic Hospital
+  'PHX-3': { lat: 33.4794, lon: -112.0980 }, // St. Joseph's Hospital And Medical Center
+  
+  // London hospitals
+  'LON-1': { lat: 51.4987, lon: -0.1178 }, // St. Thomas' Hospital
+  'LON-2': { lat: 51.5182, lon: -0.0594 }, // Royal London Hospital
+  'LON-3': { lat: 51.5246, lon: -0.1357 }  // University College Hospital
 };
 
 // Function to calculate distance between two coordinates using Haversine formula
@@ -87,6 +106,11 @@ function getCurrentSeason(): string {
   if (month >= 5 && month <= 7) return 'Summer';
   if (month >= 8 && month <= 10) return 'Fall';
   return 'Winter';
+}
+
+// Add this at the top of the file after imports
+function debug(...args: any[]) {
+  console.log('[HOSPITALS API]', new Date().toISOString(), ...args);
 }
 
 export async function GET(request: NextRequest) {

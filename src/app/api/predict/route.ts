@@ -226,7 +226,13 @@ function calculateConfidenceScore(hospital: HospitalFeatures, distance: number) 
   return Math.max(0.5, Math.min(0.95, confidenceScore));
 }
 
+// At the top of the file, add a debug function
+function debug(...args: any[]) {
+  console.log('[PREDICT API]', new Date().toISOString(), ...args);
+}
+
 export async function GET(request: NextRequest) {
+  debug('Request received', request.nextUrl.searchParams.toString());
   try {
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
@@ -234,8 +240,11 @@ export async function GET(request: NextRequest) {
     const requestedLongitude = parseFloat(searchParams.get('longitude') || '0');
     const urgencyLevel = searchParams.get('urgency') || 'Medium';
     
+    debug('Parameters:', { requestedLatitude, requestedLongitude, urgencyLevel });
+    
     // Simulate different locations for testing
     const { latitude, longitude } = simulateUserLocation(requestedLatitude, requestedLongitude);
+    debug('Simulated location:', { latitude, longitude });
     
     // Validate coordinates
     if (latitude === 0 && longitude === 0) {
@@ -374,6 +383,36 @@ export async function GET(request: NextRequest) {
       };
     });
     
+    // Before loading hospital features
+    debug('Loading hospital features from files');
+    
+    // After loading hospital features
+    debug(`Loaded ${hospitalFeatures.length} hospital features`);
+    
+    // Before calculating distances
+    debug('Calculating distances for hospitals');
+    
+    // After sorting hospitals
+    debug(`Sorted ${sortedHospitals.length} hospitals by distance`);
+    
+    // After selecting hospitals
+    debug(`Selected ${selectedHospitals.length} hospitals for prediction`);
+    
+    // Before getting contextual data
+    debug('Getting contextual data (traffic, weather, events)');
+    
+    // After getting contextual data
+    debug('Contextual data:', { trafficCondition, weatherCondition, localEvents: localEvents.length });
+    
+    // Before calculating predictions
+    debug('Calculating predictions for hospitals');
+    
+    // After calculating predictions
+    debug(`Generated predictions for ${hospitalsWithPredictions.length} hospitals`);
+    
+    // Before returning response
+    debug('Returning response to client');
+    
     return NextResponse.json({
       hospitals: hospitalsWithPredictions,
       contextualFactors: {
@@ -385,6 +424,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    debug('ERROR:', error);
     console.error('Error predicting wait times:', error);
     return NextResponse.json(
       { error: 'Failed to predict wait times' },

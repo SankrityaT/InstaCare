@@ -26,10 +26,12 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="bg-instacare-600 hover:bg-instacare-700">
-                How does it work?
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="#how-it-works">
+                <Button size="lg" className="bg-instacare-600 hover:bg-instacare-700">
+                  How does it work?
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               {/* <Button variant="outline" size="lg">
                 See How It Works
               </Button> */}
@@ -49,9 +51,9 @@ const Hero = () => {
               </div>
               <div className="p-6 space-y-4">
                 {[
-                  { hospital: "Banner University Medical Center Phoenix", time: "6h 4min", status: "High", miles: "5.2 miles" },
-                  { hospital: "Mayo Clinic Hospital", time: "4h 28min", status: "High", miles: "3.8 miles" },
-                  { hospital: "St. Joseph's Hospital And Medical Center", time: "56 min", status: "Medium", miles: "2.5 miles" },
+                  { hospital: "Banner University Medical Center Phoenix", time: "6h 4m", status: "High", miles: "5.2 miles" },
+                  { hospital: "Mayo Clinic Hospital", time: "4h 28m", status: "High", miles: "3.8 miles" },
+                  { hospital: "St. Joseph's Hospital And Medical Center", time: "56m", status: "Medium", miles: "2.5 miles" },
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
                     <div>
@@ -59,7 +61,7 @@ const Hero = () => {
                       <span className="text-sm text-gray-500">{item.miles} away</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-lg">{item.time}</div>
+                      <div className="font-bold text-lg whitespace-nowrap">{item.time}</div>
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         item.status === "Low" 
                           ? "bg-green-100 text-green-800" 

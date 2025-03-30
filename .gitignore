@@ -28,3 +28,13 @@ dist-ssr
 out/
 next-env.d.ts
 .vercel
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
