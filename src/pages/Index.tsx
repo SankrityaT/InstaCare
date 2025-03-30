@@ -6,7 +6,7 @@ import Problem from '@/components/Problem';
 import Solution from '@/components/Solution';
 import HowItWorks from '@/components/HowItWorks';
 import Benefits from '@/components/Benefits';
-import SignUpForm from '@/components/SignUpForm';
+
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -19,7 +19,6 @@ const Index = () => {
         <Solution />
         <HowItWorks />
         <Benefits />
-        <SignUpForm />
       </main>
       <Footer />
     </div>

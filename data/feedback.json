@@ -1,0 +1,18 @@
+[
+  {
+    "hospitalId": "PHX-1",
+    "hospitalName": "Banner University Medical Center Phoenix",
+    "reportType": "incorrect-wait",
+    "actualWaitTime": 45,
+    "comments": "n/a",
+    "timestamp": 1743326765129
+  },
+  {
+    "hospitalId": "PHX-1",
+    "hospitalName": "Banner University Medical Center Phoenix",
+    "reportType": "incorrect-wait",
+    "actualWaitTime": 20,
+    "comments": "",
+    "timestamp": 1743327199662
+  }
+]

@@ -1,20 +1,21 @@
 import React from 'react';
 import Header from '@/components/Header';
-// Remove the SignUpForm import
 import Hero from '@/components/Hero';
-import Benefits from '@/components/Benefits';
+import Problem from '@/components/Problem';
+import Solution from '@/components/Solution';
 import HowItWorks from '@/components/HowItWorks';
-
+import Benefits from '@/components/Benefits';
 import Footer from '@/components/Footer';
-// The SignUpForm import should be removed
 
 export default function Home() {
   return (
     <main>
       <Header />
       <Hero />
-      <Benefits />
+      <Problem />
+      <Solution />
       <HowItWorks />
+      <Benefits />
       <Footer />
     </main>
   );

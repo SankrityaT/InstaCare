@@ -55,7 +55,7 @@ const HowItWorks = () => {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-center text-instacare-800">{item.title}</h3>
-                <p className="text-foreground/70 text-center mb-3 text-lg font-medium">{item.description}</p>
+                <p className="text-foreground/70 text-center mb-6 text-lg font-medium min-h-[80px]">{item.description}</p>
                 <span className="inline-block bg-instacare-50 text-instacare-700 rounded-full px-3 py-1 text-xs font-medium transition-shadow duration-300 hover:shadow-lg hover:shadow-instacare-500/50">
                   {item.additionalInfo}
                 </span>
@@ -84,7 +84,7 @@ const HowItWorks = () => {
                   <div>
                     <h4 className="font-semibold mb-2">Hospital-provided Data</h4>
                     <p className="text-sm text-foreground/70">
-                      Where available, we connect to official hospital APIs to get direct wait time reports.
+                      Where available, we connect to official hospital databases to get direct wait time reports.
                     </p>
                   </div>
                 </div>

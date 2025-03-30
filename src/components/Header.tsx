@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Clock, AlertCircle } from "lucide-react";
-import Link from 'next/link';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,12 +17,11 @@ const Header = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
+          <a href="#problem" className="text-foreground/80 hover:text-instacare-600 transition-colors">Problem</a>
           <a href="#solution" className="text-foreground/80 hover:text-instacare-600 transition-colors">Solution</a>
           <a href="#how-it-works" className="text-foreground/80 hover:text-instacare-600 transition-colors">How It Works</a>
           <a href="#benefits" className="text-foreground/80 hover:text-instacare-600 transition-colors">Benefits</a>
-          <Link href="/hospitals">
-            <Button className="bg-instacare-600 hover:bg-instacare-700">Get Started</Button>
-          </Link>
+          <Button className="bg-instacare-600 hover:bg-instacare-700" onClick={() => window.location.href = '/hospitals'}>Get Started</Button>
         </nav>
         
         {/* Mobile Menu Button */}
@@ -67,14 +65,15 @@ const Header = () => {
             >
               Benefits
             </a>
-            <Link href="/hospitals">
-              <Button 
-                className="bg-instacare-600 hover:bg-instacare-700 w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Get Started
-              </Button>
-            </Link>
+            <Button 
+              className="bg-instacare-600 hover:bg-instacare-700 w-full"
+              onClick={() => {
+                setIsMenuOpen(false);
+                window.location.href = '/hospitals';
+              }}
+            >
+              Get Started
+            </Button>
           </nav>
         </div>
       )}
