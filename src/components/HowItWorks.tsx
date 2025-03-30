@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, MapPin, ArrowRight, MessageSquare, Zap, Database, PieChart, AlertCircle } from 'lucide-react';
 
@@ -17,9 +16,6 @@ const HowItWorks = () => {
         </div>
         
         <div className="relative">
-          {/* Connection lines - more visible and animated */}
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-2 bg-gradient-to-r from-instacare-200 via-instacare-400 to-medgreen-400 rounded-full -translate-y-1/2 z-0 opacity-70"></div>
-          
           <div className="grid md:grid-cols-4 gap-8 relative z-10">
             {[
               {
@@ -58,9 +54,9 @@ const HowItWorks = () => {
                     {i + 1}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-center">{item.title}</h3>
-                <p className="text-foreground/70 text-center mb-3">{item.description}</p>
-                <span className="inline-block bg-instacare-50 text-instacare-700 rounded-full px-3 py-1 text-xs font-medium">
+                <h3 className="text-xl font-semibold mb-3 text-center text-instacare-800">{item.title}</h3>
+                <p className="text-foreground/70 text-center mb-3 text-lg font-medium">{item.description}</p>
+                <span className="inline-block bg-instacare-50 text-instacare-700 rounded-full px-3 py-1 text-xs font-medium transition-shadow duration-300 hover:shadow-lg hover:shadow-instacare-500/50">
                   {item.additionalInfo}
                 </span>
               </div>
@@ -175,16 +171,16 @@ const HowItWorks = () => {
                       <div className="flex justify-between items-center">
                         <div>
                           <div className="text-lg font-semibold text-instacare-800">Prediction accuracy</div>
-                          <div className="text-xs text-instacare-600 mt-1">Averaging within 12 minutes</div>
+                          <div className="text-xs text-instacare-600 mt-1">Averaging within 5 minutes</div>
                         </div>
                         <div className="text-3xl font-bold bg-gradient-to-br from-instacare-600 to-instacare-800 bg-clip-text text-transparent">
-                          87%
+                          92%
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-instacare-100">
                         <div className="flex items-center text-xs text-instacare-700">
                           <Zap className="h-3 w-3 mr-1" />
-                          <span>Updated hourly based on machine learning</span>
+                          <span>AI updates based on severity level</span>
                         </div>
                       </div>
                     </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Clock, ArrowRight } from "lucide-react";
@@ -28,17 +27,17 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button size="lg" className="bg-instacare-600 hover:bg-instacare-700">
-                Get Early Access
+                How does it work?
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg">
+              {/* <Button variant="outline" size="lg">
                 See How It Works
-              </Button>
+              </Button> */}
             </div>
             
             <div className="pt-4 flex items-center text-sm text-muted-foreground">
               <span className="flex h-2 w-2 rounded-full bg-medgreen-500 mr-2 animate-pulse-slow"></span>
-              Currently tracking wait times at 200+ hospitals
+              Currently predicting wait times at 10+ hospitals in 3 major cities
             </div>
           </div>
           
@@ -50,14 +49,14 @@ const Hero = () => {
               </div>
               <div className="p-6 space-y-4">
                 {[
-                  { hospital: "Memorial Hospital", time: "15 min", status: "Low" },
-                  { hospital: "City Medical Center", time: "42 min", status: "Medium" },
-                  { hospital: "University Hospital", time: "87 min", status: "High" },
+                  { hospital: "Banner University Medical Center Phoenix", time: "6h 4min", status: "High", miles: "5.2 miles" },
+                  { hospital: "Mayo Clinic Hospital", time: "4h 28min", status: "High", miles: "3.8 miles" },
+                  { hospital: "St. Joseph's Hospital And Medical Center", time: "56 min", status: "Medium", miles: "2.5 miles" },
                 ].map((item, i) => (
                   <div key={i} className="flex justify-between items-center p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
                     <div>
                       <h4 className="font-medium">{item.hospital}</h4>
-                      <span className="text-sm text-gray-500">5.2 miles away</span>
+                      <span className="text-sm text-gray-500">{item.miles} away</span>
                     </div>
                     <div className="text-right">
                       <div className="font-bold text-lg">{item.time}</div>
@@ -68,7 +67,7 @@ const Hero = () => {
                             ? "bg-yellow-100 text-yellow-800" 
                             : "bg-red-100 text-red-800"
                       }`}>
-                        {item.status} Wait
+                        {item.status} 
                       </span>
                     </div>
                   </div>

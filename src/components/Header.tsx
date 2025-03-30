@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -22,7 +21,7 @@ const Header = () => {
           <a href="#solution" className="text-foreground/80 hover:text-instacare-600 transition-colors">Solution</a>
           <a href="#how-it-works" className="text-foreground/80 hover:text-instacare-600 transition-colors">How It Works</a>
           <a href="#benefits" className="text-foreground/80 hover:text-instacare-600 transition-colors">Benefits</a>
-          <Button className="bg-instacare-600 hover:bg-instacare-700">Get Early Access</Button>
+          <Button className="bg-instacare-600 hover:bg-instacare-700">Get Started</Button>
         </nav>
         
         {/* Mobile Menu Button */}
@@ -70,7 +69,7 @@ const Header = () => {
               className="bg-instacare-600 hover:bg-instacare-700 w-full"
               onClick={() => setIsMenuOpen(false)}
             >
-              Get Early Access
+              Get Started
             </Button>
           </nav>
         </div>
