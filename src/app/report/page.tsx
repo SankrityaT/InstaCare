@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,7 @@ interface FeedbackData {
   timestamp: number;
 }
 
-export default function ReportPage() {
+function ReportPageContent() {
   // Update the searchParams usage with proper null checks
   const searchParams = useSearchParams();
   const hospitalId = searchParams?.get('id') || '';
@@ -230,5 +230,33 @@ export default function ReportPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" className="mr-2" disabled>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Hospitals
+          </Button>
+          <h1 className="text-3xl font-bold">Report Wait Time</h1>
+        </div>
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardContent className="p-8">
+              <div className="flex justify-center items-center">
+                <Loader2 className="h-8 w-8 animate-spin text-instacare-600" />
+                <span className="ml-3 text-lg">Loading...</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    }>
+      <ReportPageContent />
+    </Suspense>
   );
 }
