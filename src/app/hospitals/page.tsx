@@ -44,26 +44,25 @@ interface HospitalWithCoords extends Hospital {
   };
 }
 
-// Hospital coordinates for mapping
-const hospitalCoordinates: Record<string, { lat: number; lng: number }> = {
-  // San Francisco / California
-  'HOSP-1': { lat: 37.7749, lng: -122.4194 },
-  'HOSP-2': { lat: 37.3382, lng: -121.8863 },
-  'HOSP-3': { lat: 38.5816, lng: -121.4944 },
-  'HOSP-4': { lat: 36.7783, lng: -119.4179 },
-  'HOSP-5': { lat: 34.0522, lng: -118.2437 },
-  // New York
-  'NYC-1': { lat: 40.7128, lng: -74.0060 },
-  'NYC-2': { lat: 40.7589, lng: -73.9851 },
-  'NYC-3': { lat: 40.8448, lng: -73.8648 },
-  // Phoenix
-  'PHX-1': { lat: 33.4484, lng: -112.0740 },
-  'PHX-2': { lat: 33.5722, lng: -112.0891 },
-  'PHX-3': { lat: 33.3883, lng: -111.9647 },
-  // London
-  'LON-1': { lat: 51.5074, lng: -0.1278 },
-  'LON-2': { lat: 51.5225, lng: -0.1539 },
-  'LON-3': { lat: 51.4700, lng: -0.1534 }
+// Function to get coordinates using Google Maps Geocoding API
+const getCoordinates = async (address: string): Promise<{ lat: number, lng: number }> => {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`);
+  const data = await response.json();
+  if (data.status === 'OK') {
+    const location = data.results[0].geometry.location;
+    return { lat: location.lat, lng: location.lng };
+  } else {
+    console.error('Geocoding API error:', data.status);
+    return { lat: 0, lng: 0 };
+  }
+};
+
+const urgencyLevels: Record<string, number> = {
+  'Critical': 1,
+  'High': 2,
+  'Medium': 3,
+  'Low': 4
 };
 
 export default function HospitalsPage() {
@@ -77,6 +76,7 @@ export default function HospitalsPage() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const mapElement = useRef<HTMLDivElement | null>(null);
 
   // Function to get user's location
   const getUserLocation = () => {
@@ -104,7 +104,73 @@ export default function HospitalsPage() {
     );
   };
 
-  // Function to fetch hospitals data
+  // Function to fetch hospital data from JSON files
+  const fetchHospitalData = async () => {
+    try {
+      const response = await fetch('/data/hospital-features.json');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching hospital data:', error);
+      return [];
+    }
+  };
+
+  // Function to initialize the Google Map
+  const initializeGoogleMap = () => {
+    if (!mapRef.current && mapElement.current) {
+      const map = new google.maps.Map(mapElement.current, {
+        center: { lat: userLocation?.latitude || 0, lng: userLocation?.longitude || 0 },
+        zoom: 10,
+      });
+      mapRef.current = map;
+
+      // Add markers for each hospital
+      hospitals.forEach(hospital => {
+        const marker = new google.maps.Marker({
+          position: { lat: hospital.coordinates.lat, lng: hospital.coordinates.lng },
+          map,
+          title: hospital.name,
+        });
+        markersRef.current.push(marker);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (mapLoaded) {
+      initializeGoogleMap();
+    }
+  }, [mapLoaded, hospitals]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchHospitalData();
+      const hospitalsWithCoords = await Promise.all(data.map(async (hospital: Hospital) => {
+        const coordinates = await getCoordinates(hospital.name + ', ' + hospital.region);
+        return { ...hospital, coordinates };
+      }));
+      setHospitals(hospitalsWithCoords);
+      updateMapCenter(hospitalsWithCoords);
+    };
+    loadData();
+  }, []);
+
+  // Function to filter hospitals based on urgency
+  const filterHospitalsByUrgency = (urgencyLevel: string) => {
+    const level = urgencyLevels[urgencyLevel];
+    return hospitals.filter(hospital => {
+      return hospital.prediction.predictedWaitTime <= level;
+    });
+  };
+
+  useEffect(() => {
+    const filteredHospitals = filterHospitalsByUrgency(urgency);
+    setHospitals(filteredHospitals);
+    updateMapCenter(filteredHospitals);
+  }, [urgency]);
+
+  // Ensure fetchHospitals is an async function
   const fetchHospitals = async (latitude: number, longitude: number, urgencyLevel: string) => {
     try {
       setLoading(true);
@@ -118,22 +184,18 @@ export default function HospitalsPage() {
       
       const data = await response.json();
       
-      // Add coordinates to each hospital - but don't generate random ones
-      const hospitalsWithCoords = data.hospitals.map((hospital: Hospital) => ({
+      // Add coordinates to each hospital
+      const hospitalsWithCoords = await Promise.all(data.hospitals.map(async (hospital: Hospital) => ({
         ...hospital,
-        coordinates: hospitalCoordinates[hospital.id] || { 
-          // Use null coordinates instead of random ones
-          lat: 0, 
-          lng: 0 
-        }
-      }));
+        coordinates: await getCoordinates(hospital.name + ', ' + hospital.region)
+      })));
       
       setHospitals(hospitalsWithCoords);
       setLoading(false);
       
       // Initialize or update map with new hospitals
       if (mapLoaded && hospitalsWithCoords.length > 0) {
-        initializeMap(hospitalsWithCoords, { lat: latitude, lng: longitude });
+        initializeGoogleMap();
       }
     } catch (error) {
       setError("Error fetching hospital data");
@@ -141,122 +203,28 @@ export default function HospitalsPage() {
     }
   };
 
-  // Initialize Google Map
-  const initializeMap = (hospitals: HospitalWithCoords[], userLocation: { lat: number, lng: number }) => {
-    if (!mapRef.current) return;
-    
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
-    markersRef.current = [];
-    
-    // Center map on user location
-    mapRef.current.setCenter(userLocation);
-    
-    // Add user location marker
-    const userMarker = new google.maps.Marker({
-      position: userLocation,
-      map: mapRef.current,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: "#4285F4",
-        fillOpacity: 1,
-        strokeColor: "#FFFFFF",
-        strokeWeight: 2,
-      },
-      title: "Your Location"
-    });
-    markersRef.current.push(userMarker);
-    
-    // Add hospital markers
-    hospitals.forEach((hospital, index) => {
-      if (hospital.coordinates.lat === 0 && hospital.coordinates.lng === 0) return;
-      
-      const waitTimeCategory = getWaitTimeCategory(hospital.prediction.predictedWaitTime);
-      const markerColor = waitTimeCategory === 'Low' ? '#4CAF50' : 
-                          waitTimeCategory === 'Medium' ? '#FFC107' : '#F44336';
-      
-      const marker = new google.maps.Marker({
-        position: hospital.coordinates,
-        map: mapRef.current!,
-        title: hospital.name,
-        label: {
-          text: (index + 1).toString(),
-          color: 'white'
-        },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: markerColor,
-          fillOpacity: 0.9,
-          strokeColor: '#FFFFFF',
-          strokeWeight: 2,
-        }
-      });
-      
-      // Add click listener to marker
-      marker.addListener('click', () => {
-        setSelectedHospital(hospital);
-        
-        // Create info window content
-        const contentString = `
-          <div style="padding: 10px; max-width: 200px;">
-            <h3 style="margin: 0 0 5px 0; font-size: 16px;">${hospital.name}</h3>
-            <p style="margin: 0 0 5px 0; font-size: 14px;">${formatWaitTime(hospital.prediction.predictedWaitTime)} wait</p>
-            <p style="margin: 0; font-size: 12px;">${formatDistance(hospital.distance)} away</p>
-          </div>
-        `;
-        
-        const infoWindow = new google.maps.InfoWindow({
-          content: contentString,
-        });
-        
-        infoWindow.open(mapRef.current!, marker);
-      });
-      
-      markersRef.current.push(marker);
-    });
-    
-    // Fit bounds to include all markers
-    if (markersRef.current.length > 1) {
-      const bounds = new google.maps.LatLngBounds();
-      markersRef.current.forEach(marker => {
-        bounds.extend(marker.getPosition()!);
-      });
-      mapRef.current.fitBounds(bounds);
-    }
-  };
-
   // Function to initialize map when Google Maps script is loaded
   const handleMapInit = () => {
     if (!window.google || !document.getElementById('map')) return;
     
-    mapRef.current = new google.maps.Map(document.getElementById('map')!, {
-      center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
-      zoom: 10,
-      mapTypeControl: false,
-      fullscreenControl: false,
-      streetViewControl: false,
-      styles: [
-        {
-          featureType: "poi.medical",
-          elementType: "geometry",
-          stylers: [{ visibility: "on" }, { color: "#f5f5f5" }]
-        },
-        {
-          featureType: "poi.medical",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#4285F4" }]
-        }
-      ]
-    });
+    mapElement.current = document.getElementById('map') as HTMLDivElement;
     
     setMapLoaded(true);
     
     // If we already have hospitals and user location, initialize the map
     if (hospitals.length > 0 && userLocation) {
-      initializeMap(hospitals, { lat: userLocation.latitude, lng: userLocation.longitude });
+      initializeGoogleMap();
     }
+  };
+
+  // Update map center based on filtered hospitals
+  const updateMapCenter = (hospitals: HospitalWithCoords[]) => {
+    if (!mapRef.current || hospitals.length === 0) return;
+    const bounds = new google.maps.LatLngBounds();
+    hospitals.forEach(hospital => {
+      bounds.extend(new google.maps.LatLng(hospital.coordinates.lat, hospital.coordinates.lng));
+    });
+    mapRef.current.fitBounds(bounds);
   };
 
   // Filter hospitals based on search query
@@ -308,7 +276,7 @@ export default function HospitalsPage() {
   // Update map when hospitals or selected hospital changes
   useEffect(() => {
     if (mapLoaded && hospitals.length > 0 && userLocation) {
-      initializeMap(hospitals, { lat: userLocation.latitude, lng: userLocation.longitude });
+      initializeGoogleMap();
     }
   }, [mapLoaded, selectedHospital]);
 
@@ -536,7 +504,7 @@ export default function HospitalsPage() {
           
           {/* Google Map */}
           <div className="relative h-[calc(100vh-200px)] rounded-lg overflow-hidden border">
-            <div id="map" className="w-full h-full"></div>
+            <div id="map" ref={mapElement} className="w-full h-full"></div>
             {!mapLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
