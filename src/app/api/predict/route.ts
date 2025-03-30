@@ -200,6 +200,32 @@ function getDayInfo(): { dayOfWeek: string, isWeekend: boolean } {
   return { dayOfWeek, isWeekend };
 }
 
+// Calculate a dynamic confidence score based on multiple factors
+function calculateConfidenceScore(hospital: HospitalFeatures, distance: number) {
+  // Base confidence starts at 0.9 (90%)
+  let confidenceScore = 0.9;
+  
+  // Reduce confidence based on distance (farther = less confident)
+  // Subtract up to 0.1 for distances over 20km
+  const distanceFactor = Math.min(0.1, distance / 200);
+  confidenceScore -= distanceFactor;
+  
+  // Reduce confidence if we have limited historical data
+  // visitCount is the number of data points we have for this hospital
+  if (hospital.visitCount < 10) {
+    confidenceScore -= 0.1;
+  }
+  
+  // Adjust based on time of day - we might be less confident during unusual hours
+  const hour = new Date().getHours();
+  if (hour < 6 || hour > 22) {
+    confidenceScore -= 0.05;
+  }
+  
+  // Ensure confidence stays between 0.5 and 0.95
+  return Math.max(0.5, Math.min(0.95, confidenceScore));
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Get query parameters
@@ -320,6 +346,9 @@ export async function GET(request: NextRequest) {
       if (localEvents.length > 0) otherFactors.push(`Local events: ${localEvents.join(', ')}`);
       if (isWeekend) otherFactors.push('Weekend hours');
       
+      // Calculate dynamic confidence score
+      const confidenceScore = calculateConfidenceScore(hospital, hospital.distance);
+      
       return {
         id: hospital.id,
         name: hospital.name,
@@ -328,18 +357,18 @@ export async function GET(request: NextRequest) {
         facilitySize: hospital.facilitySize,
         nurseToPatientRatio: hospital.nurseToPatientRatio,
         patientSatisfaction: hospital.patientSatisfaction,
-        historicalWaitTime: hospital.averageWaitTimes.byUrgency[urgencyLevel as keyof typeof hospital.averageWaitTimes.byUrgency],
+        historicalWaitTime: hospital.averageWaitTimes.overall,
         prediction: {
-          predictedWaitTime,
-          confidenceScore: 0.85,
+          predictedWaitTime: predictedWaitTime,
+          confidenceScore: confidenceScore,
           factors: {
-            baseWaitTime,
-            timeOfDayFactor,
-            seasonFactor,
-            dayOfWeekFactor,
-            trafficFactor,
-            weatherFactor,
-            otherFactors
+            baseWaitTime: baseWaitTime,
+            timeOfDayFactor: timeOfDayFactor,
+            seasonFactor: seasonFactor,
+            dayOfWeekFactor: dayOfWeekFactor,
+            trafficFactor: trafficFactor,
+            weatherFactor: weatherFactor,
+            otherFactors: otherFactors
           }
         }
       };

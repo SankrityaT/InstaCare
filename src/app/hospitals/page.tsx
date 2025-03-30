@@ -266,8 +266,11 @@ export default function HospitalsPage() {
   );
 
   // Format distance to show in km or miles
+  // Format distance to show in miles instead of km
   const formatDistance = (distance: number) => {
-    return `${distance.toFixed(1)} km`;
+  // Convert km to miles (1 km ≈ 0.621371 miles)
+  const miles = distance * 0.621371;
+  return `${miles.toFixed(1)} mi`;
   };
 
   // Format wait time to show hours and minutes
