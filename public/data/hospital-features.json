@@ -1,0 +1,232 @@
+[
+  {
+    "id": "HOSP-1",
+    "name": "Springfield General Hospital",
+    "region": "Urban",
+    "facilitySize": 92,
+    "prediction": {
+      "predictedWaitTime": 82.70120724346077,
+      "confidence": 0.85,
+      "confidenceScore": 0.85,
+      "factors": {
+        "baseWaitTime": 60,
+        "timeOfDayFactor": 1.2,
+        "seasonFactor": 1.1,
+        "dayOfWeekFactor": 0.9,
+        "trafficFactor": 1.3,
+        "weatherFactor": 1.05,
+        "otherFactors": ["Hospital capacity", "Staff availability"]
+      }
+    },
+    "averageWaitTimes": {
+      "overall": 82.70120724346077,
+      "byUrgency": {
+        "Critical": 18.558823529411764,
+        "High": 43.56126482213439,
+        "Medium": 95.03571428571429,
+        "Low": 170.58964143426294
+      },
+      "byTimeOfDay": {
+        "Early Morning": 49.833333333333336,
+        "Late Morning": 73.33112582781457,
+        "Afternoon": 81.4391891891892,
+        "Evening": 98.36797752808988,
+        "Night": 76.03157894736842
+      },
+      "bySeason": {
+        "Winter": 100.38247011952191,
+        "Spring": 74.76394849785407,
+        "Summer": 90.248,
+        "Fall": 65.48846153846154
+      }
+    },
+    "nurseToPatientRatio": 3.2706237424547284,
+    "specialistAvailability": 5.454728370221328,
+    "patientSatisfaction": 2.7313883299798793,
+    "visitCount": 994
+  },
+  {
+    "id": "HOSP-3",
+    "name": "Northside Community Hospital",
+    "region": "Rural",
+    "facilitySize": 38,
+    "prediction": {
+      "predictedWaitTime": 81.76276276276276,
+      "confidence": 0.82,
+      "confidenceScore": 0.82,
+      "factors": {
+        "baseWaitTime": 55,
+        "timeOfDayFactor": 1.25,
+        "seasonFactor": 1.05,
+        "dayOfWeekFactor": 0.95,
+        "trafficFactor": 1.2,
+        "weatherFactor": 1.1,
+        "otherFactors": ["Rural location", "Limited staff"]
+      }
+    },
+    "averageWaitTimes": {
+      "overall": 81.76276276276276,
+      "byUrgency": {
+        "Critical": 18.240816326530613,
+        "High": 41.5,
+        "Medium": 93.10526315789474,
+        "Low": 176.9061224489796
+      },
+      "byTimeOfDay": {
+        "Early Morning": 52.310344827586206,
+        "Late Morning": 63.36645962732919,
+        "Afternoon": 77.27090301003345,
+        "Evening": 102.51327433628319,
+        "Night": 80.28318584070796
+      },
+      "bySeason": {
+        "Winter": 103.58333333333333,
+        "Spring": 68.01587301587301,
+        "Summer": 89.68825910931174,
+        "Fall": 65.66532258064517
+      }
+    },
+    "nurseToPatientRatio": 3.2332332332332334,
+    "specialistAvailability": 1.4754754754754755,
+    "patientSatisfaction": 2.808808808808809,
+    "visitCount": 999
+  },
+  {
+    "id": "HOSP-2",
+    "name": "Riverside Medical Center",
+    "region": "Urban",
+    "facilitySize": 94,
+    "prediction": {
+      "predictedWaitTime": 81.80645161290323,
+      "confidence": 0.87,
+      "confidenceScore": 0.87,
+      "factors": {
+        "baseWaitTime": 58,
+        "timeOfDayFactor": 1.15,
+        "seasonFactor": 1.12,
+        "dayOfWeekFactor": 0.92,
+        "trafficFactor": 1.25,
+        "weatherFactor": 1.02,
+        "otherFactors": ["Urban location", "High patient volume"]
+      }
+    },
+    "averageWaitTimes": {
+      "overall": 81.80645161290323,
+      "byUrgency": {
+        "Critical": 18.63673469387755,
+        "High": 43.74242424242424,
+        "Medium": 95.4595588235294,
+        "Low": 171.93801652892563
+      },
+      "byTimeOfDay": {
+        "Early Morning": 52.7979797979798,
+        "Late Morning": 66.46666666666667,
+        "Afternoon": 82.88817891373802,
+        "Evening": 97.40871934604904,
+        "Night": 72.31914893617021
+      },
+      "bySeason": {
+        "Winter": 97.49808429118774,
+        "Spring": 69.41353383458646,
+        "Summer": 87.66539923954373,
+        "Fall": 71.76394849785407
+      }
+    },
+    "nurseToPatientRatio": 3.260019550342131,
+    "specialistAvailability": 5.518084066471164,
+    "patientSatisfaction": 2.7595307917888565,
+    "visitCount": 1023
+  },
+  {
+    "id": "HOSP-5",
+    "name": "Summit Health Center",
+    "region": "Urban",
+    "facilitySize": 167,
+    "prediction": {
+      "predictedWaitTime": 81.42770475227502,
+      "confidence": 0.89,
+      "confidenceScore": 0.89,
+      "factors": {
+        "baseWaitTime": 62,
+        "timeOfDayFactor": 1.1,
+        "seasonFactor": 1.08,
+        "dayOfWeekFactor": 0.88,
+        "trafficFactor": 1.18,
+        "weatherFactor": 1.03,
+        "otherFactors": ["Urban location", "Specialized facility"]
+      }
+    },
+    "averageWaitTimes": {
+      "overall": 81.42770475227502,
+      "byUrgency": {
+        "Critical": 18.354477611940297,
+        "High": 44.61087866108787,
+        "Medium": 94.49794238683127,
+        "Low": 175.68200836820083
+      },
+      "byTimeOfDay": {
+        "Early Morning": 47.82022471910113,
+        "Late Morning": 71.31210191082802,
+        "Afternoon": 81.38013698630137,
+        "Evening": 96.8414985590778,
+        "Night": 74.16346153846153
+      },
+      "bySeason": {
+        "Winter": 97,
+        "Spring": 78.28632478632478,
+        "Summer": 86.42148760330579,
+        "Fall": 63.286852589641434
+      }
+    },
+    "nurseToPatientRatio": 3.1911021233569263,
+    "specialistAvailability": 5.338725985844287,
+    "patientSatisfaction": 2.782608695652174,
+    "visitCount": 989
+  },
+  {
+    "id": "HOSP-4",
+    "name": "St. Mary's Regional Health",
+    "region": "Rural",
+    "facilitySize": 25,
+    "prediction": {
+      "predictedWaitTime": 81.88643216080402,
+      "confidence": 0.81,
+      "confidenceScore": 0.81,
+      "factors": {
+        "baseWaitTime": 57,
+        "timeOfDayFactor": 1.22,
+        "seasonFactor": 1.15,
+        "dayOfWeekFactor": 0.9,
+        "trafficFactor": 1.15,
+        "weatherFactor": 1.08,
+        "otherFactors": ["Rural location", "Weekend staffing"]
+      }
+    },
+    "averageWaitTimes": {
+      "overall": 81.88643216080402,
+      "byUrgency": {
+        "Critical": 17.971544715447155,
+        "High": 42.5726872246696,
+        "Medium": 90.5667870036101,
+        "Low": 172.6734693877551
+      },
+      "byTimeOfDay": {
+        "Early Morning": 57.05882352941177,
+        "Late Morning": 66.19867549668874,
+        "Afternoon": 79.70198675496688,
+        "Evening": 104.02848101265823,
+        "Night": 70.30645161290323
+      },
+      "bySeason": {
+        "Winter": 93.53448275862068,
+        "Spring": 72.38842975206612,
+        "Summer": 93.92114695340501,
+        "Fall": 66.34297520661157
+      }
+    },
+    "nurseToPatientRatio": 3.235175879396985,
+    "specialistAvailability": 1.5618090452261306,
+    "patientSatisfaction": 2.7758793969849247,
+    "visitCount": 995
+  }
+]

@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, MapPin, Clock, Search, ArrowLeft, Navigation } from "lucide-react";
+import { Loader2, MapPin, Clock, Search, ArrowLeft, Navigation, AlertCircle, MessageSquare } from "lucide-react";
 import Link from 'next/link';
 import Script from 'next/script';
 import PredictionFactors from '@/components/PredictionFactors';
+import { Badge } from "@/components/ui/badge";
 
 /// <reference types="@types/google.maps" />
 
@@ -44,25 +45,31 @@ interface HospitalWithCoords extends Hospital {
   };
 }
 
-// Function to get coordinates using Google Maps Geocoding API
-const getCoordinates = async (address: string): Promise<{ lat: number, lng: number }> => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`);
-  const data = await response.json();
-  if (data.status === 'OK') {
-    const location = data.results[0].geometry.location;
-    return { lat: location.lat, lng: location.lng };
-  } else {
-    console.error('Geocoding API error:', data.status);
-    return { lat: 0, lng: 0 };
-  }
-};
+// Extend the Google Maps Marker type to include our custom infoWindow property
+interface ExtendedMarker extends google.maps.Marker {
+  infoWindow?: google.maps.InfoWindow;
+}
 
-const urgencyLevels: Record<string, number> = {
-  'Critical': 1,
-  'High': 2,
-  'Medium': 3,
-  'Low': 4
+// Hospital coordinates for mapping
+const hospitalCoordinates: Record<string, { lat: number; lng: number }> = {
+  // San Francisco / California
+  'HOSP-1': { lat: 37.7749, lng: -122.4194 },
+  'HOSP-2': { lat: 37.3382, lng: -121.8863 },
+  'HOSP-3': { lat: 38.5816, lng: -121.4944 },
+  'HOSP-4': { lat: 36.7783, lng: -119.4179 },
+  'HOSP-5': { lat: 34.0522, lng: -118.2437 },
+  // New York
+  'NYC-1': { lat: 40.7128, lng: -74.0060 },
+  'NYC-2': { lat: 40.7589, lng: -73.9851 },
+  'NYC-3': { lat: 40.8448, lng: -73.8648 },
+  // Phoenix
+  'PHX-1': { lat: 33.4484, lng: -112.0740 },
+  'PHX-2': { lat: 33.5722, lng: -112.0891 },
+  'PHX-3': { lat: 33.3883, lng: -111.9647 },
+  // London
+  'LON-1': { lat: 51.5074, lng: -0.1278 },
+  'LON-2': { lat: 51.5225, lng: -0.1539 },
+  'LON-3': { lat: 51.4700, lng: -0.1534 }
 };
 
 export default function HospitalsPage() {
@@ -75,8 +82,7 @@ export default function HospitalsPage() {
   const [selectedHospital, setSelectedHospital] = useState<HospitalWithCoords | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
-  const mapElement = useRef<HTMLDivElement | null>(null);
+  const markersRef = useRef<ExtendedMarker[]>([]);
 
   // Function to get user's location
   const getUserLocation = () => {
@@ -104,73 +110,7 @@ export default function HospitalsPage() {
     );
   };
 
-  // Function to fetch hospital data from JSON files
-  const fetchHospitalData = async () => {
-    try {
-      const response = await fetch('/data/hospital-features.json');
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching hospital data:', error);
-      return [];
-    }
-  };
-
-  // Function to initialize the Google Map
-  const initializeGoogleMap = () => {
-    if (!mapRef.current && mapElement.current) {
-      const map = new google.maps.Map(mapElement.current, {
-        center: { lat: userLocation?.latitude || 0, lng: userLocation?.longitude || 0 },
-        zoom: 10,
-      });
-      mapRef.current = map;
-
-      // Add markers for each hospital
-      hospitals.forEach(hospital => {
-        const marker = new google.maps.Marker({
-          position: { lat: hospital.coordinates.lat, lng: hospital.coordinates.lng },
-          map,
-          title: hospital.name,
-        });
-        markersRef.current.push(marker);
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (mapLoaded) {
-      initializeGoogleMap();
-    }
-  }, [mapLoaded, hospitals]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await fetchHospitalData();
-      const hospitalsWithCoords = await Promise.all(data.map(async (hospital: Hospital) => {
-        const coordinates = await getCoordinates(hospital.name + ', ' + hospital.region);
-        return { ...hospital, coordinates };
-      }));
-      setHospitals(hospitalsWithCoords);
-      updateMapCenter(hospitalsWithCoords);
-    };
-    loadData();
-  }, []);
-
-  // Function to filter hospitals based on urgency
-  const filterHospitalsByUrgency = (urgencyLevel: string) => {
-    const level = urgencyLevels[urgencyLevel];
-    return hospitals.filter(hospital => {
-      return hospital.prediction.predictedWaitTime <= level;
-    });
-  };
-
-  useEffect(() => {
-    const filteredHospitals = filterHospitalsByUrgency(urgency);
-    setHospitals(filteredHospitals);
-    updateMapCenter(filteredHospitals);
-  }, [urgency]);
-
-  // Ensure fetchHospitals is an async function
+  // Function to fetch hospitals data
   const fetchHospitals = async (latitude: number, longitude: number, urgencyLevel: string) => {
     try {
       setLoading(true);
@@ -184,18 +124,22 @@ export default function HospitalsPage() {
       
       const data = await response.json();
       
-      // Add coordinates to each hospital
-      const hospitalsWithCoords = await Promise.all(data.hospitals.map(async (hospital: Hospital) => ({
+      // Add coordinates to each hospital - but don't generate random ones
+      const hospitalsWithCoords = data.hospitals.map((hospital: Hospital) => ({
         ...hospital,
-        coordinates: await getCoordinates(hospital.name + ', ' + hospital.region)
-      })));
+        coordinates: hospitalCoordinates[hospital.id] || { 
+          // Use null coordinates instead of random ones
+          lat: 0, 
+          lng: 0 
+        }
+      }));
       
       setHospitals(hospitalsWithCoords);
       setLoading(false);
       
       // Initialize or update map with new hospitals
       if (mapLoaded && hospitalsWithCoords.length > 0) {
-        initializeGoogleMap();
+        initializeMap(hospitalsWithCoords, { lat: latitude, lng: longitude });
       }
     } catch (error) {
       setError("Error fetching hospital data");
@@ -203,28 +147,190 @@ export default function HospitalsPage() {
     }
   };
 
+  // Initialize Google Map
+  const initializeMap = (hospitals: HospitalWithCoords[], userLocation: { lat: number, lng: number }) => {
+    if (!mapRef.current) return;
+    
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current = [];
+    
+    // Center map on user location
+    mapRef.current.setCenter(userLocation);
+    
+    // Add user location marker
+    const userMarker = new google.maps.Marker({
+      position: userLocation,
+      map: mapRef.current,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#4285F4",
+        fillOpacity: 1,
+        strokeColor: "#FFFFFF",
+        strokeWeight: 2,
+      },
+      title: "Your Location"
+    });
+    markersRef.current.push(userMarker);
+    
+    // Add hospital markers
+    hospitals.forEach((hospital, index) => {
+      if (!hospital.coordinates || (hospital.coordinates.lat === 0 && hospital.coordinates.lng === 0)) return;
+      
+      // Use fixed thresholds for marker colors
+      const waitTime = hospital.prediction.predictedWaitTime;
+      const markerColor = waitTime > 120 ? '#F44336' :  // High - red
+                          waitTime > 60 ? '#FFC107' :   // Medium - amber
+                          '#4CAF50';                    // Low - green
+      
+      const marker = new google.maps.Marker({
+        position: hospital.coordinates,
+        map: mapRef.current!,
+        title: hospital.name,
+        label: {
+          text: (index + 1).toString(),
+          color: 'white'
+        },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 12,
+          fillColor: markerColor,
+          fillOpacity: 0.9,
+          strokeColor: '#FFFFFF',
+          strokeWeight: 2,
+        }
+      }) as ExtendedMarker;
+      
+      // Add click listener to marker
+      marker.addListener('click', () => {
+        setSelectedHospital(hospital);
+        
+        // Create info window content
+        const contentString = `
+          <div style="padding: 10px; max-width: 200px;">
+            <h3 style="margin: 0 0 5px 0; font-size: 16px;">${hospital.name}</h3>
+            <p style="margin: 0 0 5px 0; font-size: 14px;">${formatWaitTime(hospital.prediction.predictedWaitTime)} wait</p>
+            <p style="margin: 0; font-size: 12px;">${formatDistance(hospital.distance)} away</p>
+          </div>
+        `;
+        
+        // Close any open info windows
+        markersRef.current.forEach(m => {
+          const extendedMarker = m as ExtendedMarker;
+          if (extendedMarker.infoWindow) {
+            extendedMarker.infoWindow.close();
+          }
+        });
+        
+        const infoWindow = new google.maps.InfoWindow({
+          content: contentString,
+        });
+        
+        // Store the info window on the marker for later reference
+        marker.infoWindow = infoWindow;
+        
+        infoWindow.open(mapRef.current!, marker);
+        
+        // Highlight the marker
+        if (marker.setAnimation) {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => marker.setAnimation(null), 1500);
+        }
+      });
+      
+      markersRef.current.push(marker);
+    });
+    
+    // Fit bounds to include all markers
+    if (markersRef.current.length > 1) {
+      const bounds = new google.maps.LatLngBounds();
+      markersRef.current.forEach(marker => {
+        bounds.extend(marker.getPosition()!);
+      });
+      mapRef.current.fitBounds(bounds);
+    }
+  };
+
   // Function to initialize map when Google Maps script is loaded
   const handleMapInit = () => {
     if (!window.google || !document.getElementById('map')) return;
     
-    mapElement.current = document.getElementById('map') as HTMLDivElement;
+    mapRef.current = new google.maps.Map(document.getElementById('map')!, {
+      center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
+      zoom: 10,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      streetViewControl: false,
+      styles: [
+        {
+          featureType: "poi.medical",
+          elementType: "geometry",
+          stylers: [{ visibility: "on" }, { color: "#f5f5f5" }]
+        },
+        {
+          featureType: "poi.medical",
+          elementType: "labels.text.fill",
+          stylers: [{ color: "#4285F4" }]
+        }
+      ]
+    });
     
     setMapLoaded(true);
     
     // If we already have hospitals and user location, initialize the map
     if (hospitals.length > 0 && userLocation) {
-      initializeGoogleMap();
+      initializeMap(hospitals, { lat: userLocation.latitude, lng: userLocation.longitude });
     }
   };
 
-  // Update map center based on filtered hospitals
-  const updateMapCenter = (hospitals: HospitalWithCoords[]) => {
-    if (!mapRef.current || hospitals.length === 0) return;
-    const bounds = new google.maps.LatLngBounds();
-    hospitals.forEach(hospital => {
-      bounds.extend(new google.maps.LatLng(hospital.coordinates.lat, hospital.coordinates.lng));
+  // Function to focus map on a specific hospital
+  const focusOnHospital = (hospital: HospitalWithCoords) => {
+    if (!mapRef.current || !hospital.coordinates) return;
+    
+    // Close any open info windows first
+    markersRef.current.forEach(m => {
+      const extendedMarker = m as ExtendedMarker;
+      if (extendedMarker.infoWindow) {
+        extendedMarker.infoWindow.close();
+      }
     });
-    mapRef.current.fitBounds(bounds);
+    
+    // Zoom in on the selected hospital
+    mapRef.current.setZoom(15);
+    mapRef.current.setCenter(hospital.coordinates);
+    
+    // Find the marker for this hospital
+    const marker = markersRef.current.find(marker => 
+      marker.getPosition()?.lat() === hospital.coordinates.lat && 
+      marker.getPosition()?.lng() === hospital.coordinates.lng
+    );
+    
+    if (marker) {
+      // Create and open info window for this hospital
+      const contentString = `
+        <div style="padding: 10px; max-width: 200px;">
+          <h3 style="margin: 0 0 5px 0; font-size: 16px;">${hospital.name}</h3>
+          <p style="margin: 0 0 5px 0; font-size: 14px;">${formatWaitTime(hospital.prediction.predictedWaitTime)} wait</p>
+          <p style="margin: 0; font-size: 12px;">${formatDistance(hospital.distance)} away</p>
+        </div>
+      `;
+      
+      const infoWindow = new google.maps.InfoWindow({
+        content: contentString,
+      });
+      
+      // Store the info window on the marker for later reference
+      marker.infoWindow = infoWindow;
+      
+      infoWindow.open(mapRef.current, marker);
+      
+      // Highlight the marker
+      if (marker.setAnimation) {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => marker.setAnimation(null), 1500);
+      }
+    }
   };
 
   // Filter hospitals based on search query
@@ -233,12 +339,11 @@ export default function HospitalsPage() {
     hospital.region.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Format distance to show in km or miles
   // Format distance to show in miles instead of km
   const formatDistance = (distance: number) => {
-  // Convert km to miles (1 km ≈ 0.621371 miles)
-  const miles = distance * 0.621371;
-  return `${miles.toFixed(1)} mi`;
+    // Convert km to miles (1 km ≈ 0.621371 miles)
+    const miles = distance * 0.621371;
+    return `${miles.toFixed(1)} mi`;
   };
 
   // Format wait time to show hours and minutes
@@ -276,9 +381,104 @@ export default function HospitalsPage() {
   // Update map when hospitals or selected hospital changes
   useEffect(() => {
     if (mapLoaded && hospitals.length > 0 && userLocation) {
-      initializeGoogleMap();
+      initializeMap(hospitals, { lat: userLocation.latitude, lng: userLocation.longitude });
     }
-  }, [mapLoaded, selectedHospital]);
+  }, [mapLoaded, selectedHospital, urgency]);
+
+  useEffect(() => {
+    if (selectedHospital) {
+      focusOnHospital(selectedHospital);
+    }
+  }, [selectedHospital]);
+
+  // Add styles to remove default margins from body and html and prevent scrolling beyond content
+  useEffect(() => {
+    // Function to set the document height to match the content
+    const setDocumentHeight = () => {
+      // Get the main element
+      const mainElement = document.querySelector('main');
+      if (!mainElement) return;
+      
+      // Calculate the total height of the main element
+      const mainHeight = mainElement.getBoundingClientRect().bottom;
+      
+      // Set the body and html height to match exactly the content height
+      document.body.style.height = `${mainHeight}px`;
+      document.documentElement.style.height = `${mainHeight}px`;
+      document.body.style.minHeight = `${mainHeight}px`;
+      document.body.style.maxHeight = `${mainHeight}px`;
+      document.documentElement.style.minHeight = `${mainHeight}px`;
+      document.documentElement.style.maxHeight = `${mainHeight}px`;
+      document.body.style.overflow = 'hidden';
+    };
+    
+    // Initial setup
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.padding = '0';
+    
+    // Set height after content is rendered and map is loaded
+    const checkMapAndSetHeight = () => {
+      if (mapLoaded) {
+        setTimeout(setDocumentHeight, 100);
+      } else {
+        setTimeout(checkMapAndSetHeight, 100);
+      }
+    };
+    
+    checkMapAndSetHeight();
+    
+    // Update height when window is resized
+    window.addEventListener('resize', setDocumentHeight);
+    
+    // Create a MutationObserver to watch for DOM changes
+    const observer = new MutationObserver(() => {
+      if (mapLoaded) {
+        setTimeout(setDocumentHeight, 100);
+      }
+    });
+    
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => {
+      // Clean up styles when component unmounts
+      document.body.style.margin = '';
+      document.body.style.padding = '';
+      document.documentElement.style.margin = '';
+      document.documentElement.style.padding = '';
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.documentElement.style.height = '';
+      document.body.style.minHeight = '';
+      document.body.style.maxHeight = '';
+      document.documentElement.style.minHeight = '';
+      document.documentElement.style.maxHeight = '';
+      window.removeEventListener('resize', setDocumentHeight);
+      observer.disconnect();
+    };
+  }, [mapLoaded]);
+
+  // Group hospitals by region
+  const groupedHospitals = Object.entries(
+    filteredHospitals.reduce((acc, hospital) => {
+      const region = hospital.region.split(',')[0].trim();
+      if (!acc[region]) {
+        acc[region] = [];
+      }
+      acc[region].push(hospital);
+      return acc;
+    }, {} as Record<string, HospitalWithCoords[]>)
+  ).map(([region, hospitals]) => ({ region, hospitals }));
+
+  // Get wait time badge color
+  const getWaitTimeBadgeColor = (waitTime: number) => {
+    const waitTimeCategory = getWaitTimeCategory(waitTime);
+    return waitTimeCategory === 'Low' ? 'bg-green-100 text-green-600' : 
+           waitTimeCategory === 'Medium' ? 'bg-amber-100 text-amber-600' : 
+           'bg-red-100 text-red-600';
+  };
 
   return (
     <>
@@ -287,24 +487,42 @@ export default function HospitalsPage() {
         onLoad={handleMapInit}
       />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Link href="/">
-            <Button variant="ghost" className="mr-2">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+      <main className="container mx-auto px-4 pt-4 pb-0" style={{ marginBottom: 0 }}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow-sm">
+          <div className="flex items-center">
+            <Link href="/">
+              <Button variant="ghost" className="mr-2 hover:bg-blue-100 transition-colors">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Nearby Hospitals</h1>
+          </div>
+          
+          <div className="mt-4 md:mt-0">
+            <Button onClick={getUserLocation} disabled={loading} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-md">
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading
+                </>
+              ) : (
+                <>
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Refresh Location
+                </>
+              )}
             </Button>
-          </Link>
-          <h1 className="text-3xl font-bold">Nearby Hospitals</h1>
+          </div>
         </div>
         
         {/* Search and filter controls */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm">
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
             <Input
               placeholder="Search hospitals by name or region..."
-              className="pl-10"
+              className="pl-10 border-blue-100 focus:border-blue-300 rounded-md shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -317,7 +535,7 @@ export default function HospitalsPage() {
                 fetchHospitals(userLocation.latitude, userLocation.longitude, value);
               }
             }}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] border-blue-100 focus:border-blue-300 rounded-md shadow-sm">
                 <SelectValue placeholder="Urgency Level" />
               </SelectTrigger>
               <SelectContent>
@@ -327,42 +545,35 @@ export default function HospitalsPage() {
                 <SelectItem value="Low">Low</SelectItem>
               </SelectContent>
             </Select>
-            
-            <Button onClick={getUserLocation} disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading
-                </>
-              ) : (
-                <>
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Refresh
-                </>
-              )}
-            </Button>
           </div>
         </div>
         
         {/* Error message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
-            {error}
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-sm mb-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            </div>
           </div>
         )}
         
         {/* Split view: Hospital list and Map */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-0">
           {/* Hospital list */}
-          <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+          <div className="space-y-4 max-h-[calc(100vh-180px)] overflow-y-auto pr-2 rounded-lg">
             {!userLocation && !loading && (
-              <div className="text-center p-8 border border-dashed rounded-lg">
-                <MapPin className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">Share Your Location</h3>
-                <p className="text-muted-foreground mb-4">
+              <div className="text-center p-8 border border-dashed rounded-lg bg-blue-50 border-blue-200">
+                <MapPin className="mx-auto h-12 w-12 text-blue-500 mb-4" />
+                <h3 className="text-lg font-medium text-blue-800">Share Your Location</h3>
+                <p className="text-blue-600 mb-4">
                   To find hospitals near you, we need your location.
                 </p>
-                <Button onClick={getUserLocation}>
+                <Button className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-md" onClick={getUserLocation}>
                   <MapPin className="mr-2 h-4 w-4" />
                   Share Location
                 </Button>
@@ -370,132 +581,108 @@ export default function HospitalsPage() {
             )}
             
             {loading && (
-              <div className="text-center p-8">
-                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary mb-4" />
-                <h3 className="text-lg font-medium">Finding hospitals near you...</h3>
+              <div className="flex flex-col items-center justify-center p-12">
+                <Loader2 className="h-12 w-12 animate-spin text-blue-500 mb-4" />
+                <p className="text-lg font-medium text-blue-800">Finding hospitals near you...</p>
+                <p className="text-blue-600">This may take a moment</p>
               </div>
             )}
             
-            {filteredHospitals.length > 0 && (
-              <>
-                <div className="mb-4">
-                  <h2 className="text-xl font-semibold mb-2">Available Hospitals</h2>
-                  <p className="text-muted-foreground">
-                    Showing {filteredHospitals.length} hospitals from various locations. 
-                    Hospitals are sorted by distance from your current location.
-                  </p>
-                </div>
-                
-                {/* Group hospitals by region */}
-                {Object.entries(
-                  filteredHospitals.reduce((acc, hospital) => {
-                    const region = hospital.region.split(',')[0].trim();
-                    if (!acc[region]) {
-                      acc[region] = [];
-                    }
-                    acc[region].push(hospital);
-                    return acc;
-                  }, {} as Record<string, HospitalWithCoords[]>)
-                ).map(([region, hospitals]) => (
-                  <div key={region} className="mb-8">
-                    <h3 className="text-lg font-medium mb-4 bg-muted p-2 rounded">
-                      {region} ({hospitals.length} hospitals)
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      {hospitals.map((hospital, index) => {
-                        const waitTimeCategory = getWaitTimeCategory(hospital.prediction.predictedWaitTime);
-                        const waitTimeColor = 
-                          waitTimeCategory === 'Low' ? 'text-green-600 bg-green-50' : 
-                          waitTimeCategory === 'Medium' ? 'text-amber-600 bg-amber-50' : 
-                          'text-red-600 bg-red-50';
-                        
-                        return (
-                          <Card 
-                            key={hospital.id} 
-                            className={`border-l-4 ${
-                              selectedHospital?.id === hospital.id ? 'border-l-primary' : 'border-l-transparent'
-                            } hover:shadow-md transition-all`}
-                            onClick={() => setSelectedHospital(hospital)}
+            {groupedHospitals.map((group, index) => (
+              <div key={index} className="mb-6">
+                <h2 className="text-xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">{group.region}</h2>
+                <div className="space-y-3">
+                  {group.hospitals.map((hospital) => (
+                    <Card 
+                      key={hospital.id} 
+                      className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedHospital?.id === hospital.id ? 'ring-2 ring-blue-500 shadow-md' : ''}`}
+                      onClick={() => setSelectedHospital(hospital)}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg font-bold">{hospital.name}</CardTitle>
+                            <CardDescription>{hospital.region} • {hospital.distance.toFixed(1)} miles away</CardDescription>
+                          </div>
+                          <Badge 
+                            className={`${getWaitTimeBadgeColor(hospital.prediction.predictedWaitTime)}`}
                           >
-                            <CardHeader className="pb-2">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <div className="flex items-center">
-                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
-                                      {index + 1}
-                                    </div>
-                                    <CardTitle className="text-xl">{hospital.name}</CardTitle>
-                                  </div>
-                                  <CardDescription>{hospital.region}</CardDescription>
-                                </div>
-                                <div className={`px-3 py-1 rounded-full text-sm font-medium ${waitTimeColor}`}>
-                                  {waitTimeCategory} Wait
-                                </div>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="pb-2">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Distance</p>
-                                  <p className="font-medium flex items-center">
-                                    <MapPin className="mr-1 h-4 w-4 text-slate-400" />
-                                    {formatDistance(hospital.distance)}
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Wait Time</p>
-                                  <p className="font-medium flex items-center">
-                                    <Clock className="mr-1 h-4 w-4 text-slate-400" />
-                                    {formatWaitTime(hospital.prediction.predictedWaitTime)}
-                                    <PredictionFactors factors={hospital.prediction.factors} />
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Confidence</p>
-                                  <p className="font-medium">
-                                    {Math.round(hospital.prediction.confidenceScore * 100)}%
-                                  </p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Historical Wait</p>
-                                  <p className="font-medium">{formatWaitTime(hospital.historicalWaitTime)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Satisfaction</p>
-                                  <p className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-muted-foreground">Facility Size</p>
-                                  <p className="font-medium">{hospital.facilitySize} beds</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                            <CardFooter>
-                              <Button 
-                                className="w-full" 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  getDirections(hospital);
-                                }}
-                              >
-                                <Navigation className="mr-2 h-4 w-4" />
-                                Get Directions
-                              </Button>
-                            </CardFooter>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
+                            {formatWaitTime(hospital.prediction.predictedWaitTime)}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 text-blue-500 mr-2" />
+                            <div>
+                              <span className="text-sm font-medium">Wait Time: </span>
+                              <span className="font-semibold">{formatWaitTime(hospital.prediction.predictedWaitTime)}</span>
+                              <span className="text-xs text-muted-foreground ml-1">
+                                (Confidence: {(hospital.prediction.confidenceScore * 100).toFixed(0)}%)
+                              </span>
+                              <PredictionFactors factors={hospital.prediction.factors} />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 mt-2">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Nurse-Patient Ratio</p>
+                              <p className="font-medium">{hospital.nurseToPatientRatio}:1</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Satisfaction</p>
+                              <p className="font-medium">{hospital.patientSatisfaction.toFixed(1)}/10</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Facility Size</p>
+                              <p className="font-medium">{hospital.facilitySize} beds</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Historical Wait</p>
+                              <p className="font-medium">{formatWaitTime(hospital.historicalWaitTime)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter>
+                        <div className="w-full flex gap-2">
+                          <Button 
+                            className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-sm" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              getDirections(hospital);
+                            }}
+                          >
+                            <Navigation className="mr-2 h-4 w-4" />
+                            Get Directions
+                          </Button>
+                          
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            className="bg-white hover:bg-blue-50 border-blue-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Navigate to the report page with hospital ID as query parameter
+                              window.location.href = `/report?id=${hospital.id}&name=${encodeURIComponent(hospital.name)}`;
+                            }}
+                          >
+                            <MessageSquare className="h-4 w-4 text-blue-500" />
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
             
             {userLocation && filteredHospitals.length === 0 && !loading && (
-              <div className="text-center p-8 border border-dashed rounded-lg">
-                <Search className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No hospitals found</h3>
-                <p className="text-muted-foreground">
+              <div className="text-center p-8 border border-dashed rounded-lg bg-blue-50 border-blue-200">
+                <Search className="mx-auto h-12 w-12 text-blue-500 mb-4" />
+                <h3 className="text-lg font-medium text-blue-800">No hospitals found</h3>
+                <p className="text-blue-600">
                   Try adjusting your search or urgency level.
                 </p>
               </div>
@@ -503,11 +690,14 @@ export default function HospitalsPage() {
           </div>
           
           {/* Google Map */}
-          <div className="relative h-[calc(100vh-200px)] rounded-lg overflow-hidden border">
-            <div id="map" ref={mapElement} className="w-full h-full"></div>
+          <div className="relative h-[calc(100vh-180px)] rounded-lg overflow-hidden border shadow-md">
+            <div id="map" className="w-full h-full"></div>
             {!mapLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="absolute inset-0 flex items-center justify-center bg-blue-50/80">
+                <div className="text-center">
+                  <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-blue-800">Loading map...</p>
+                </div>
               </div>
             )}
           </div>
