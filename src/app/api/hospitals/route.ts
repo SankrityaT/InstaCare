@@ -113,9 +113,13 @@ function debug(...args: any[]) {
   console.log('[HOSPITALS API]', new Date().toISOString(), ...args);
 }
 
+// Define a config object to make the route dynamic
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Get query parameters
+    // When using searchParams, it will now work correctly with the dynamic setting
     const searchParams = request.nextUrl.searchParams;
     const latitude = parseFloat(searchParams.get('latitude') || '0');
     const longitude = parseFloat(searchParams.get('longitude') || '0');
