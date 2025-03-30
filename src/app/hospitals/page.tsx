@@ -61,9 +61,9 @@ const hospitalCoordinates: Record<string, { lat: number; lng: number }> = {
   'PHX-2': { lat: 33.5722, lng: -112.0891 },
   'PHX-3': { lat: 33.3883, lng: -111.9647 },
   // London
-  'LDN-1': { lat: 51.5074, lng: -0.1278 },
-  'LDN-2': { lat: 51.5225, lng: -0.1539 },
-  'LDN-3': { lat: 51.4700, lng: -0.1534 }
+  'LON-1': { lat: 51.5074, lng: -0.1278 },
+  'LON-2': { lat: 51.5225, lng: -0.1539 },
+  'LON-3': { lat: 51.4700, lng: -0.1534 }
 };
 
 export default function HospitalsPage() {
