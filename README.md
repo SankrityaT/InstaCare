@@ -2,7 +2,7 @@
 
 > Real-time ER wait time prediction to help patients get seen faster when every minute matters.
 
-![InstaCare hero preview](public/placeholder.svg)
+![InstaCare hero preview](public/logo.png)
 
 ## Highlights
 
