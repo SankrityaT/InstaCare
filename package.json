@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "process-data": "ts-node src/scripts/processERData.ts",
     "process-real-data": "ts-node src/scripts/processRealERData.ts",
-    "generate-expanded-data": "ts-node src/scripts/generateExpandedData.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

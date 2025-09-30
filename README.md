@@ -1,69 +1,137 @@
-# Welcome to your Lovable project
+# InstaCare
 
-## Project info
+> Real-time ER wait time prediction to help patients get seen faster when every minute matters.
 
-**URL**: https://lovable.dev/projects/d5e36d0c-c49f-4400-a308-7168da291142
+![InstaCare hero preview](public/placeholder.svg)
 
-## How can I edit this code?
+## Highlights
 
-There are several ways of editing your application.
+- **🏆 Hackathon-winning prototype** built in 48 hours with clinicians and first responders.
+- **⏱️ Context-aware wait-time predictions** combining curated datasets with dynamic factors and user reports.
+- **🗺️ Location-aware experience** that surfaces nearby hospitals with map-based visualization.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d5e36d0c-c49f-4400-a308-7168da291142) and start prompting.
+## Table of Contents
 
-Changes made via Lovable will be committed automatically to this repo.
+- [Overview](#overview)
+- [Features](#features)
+- [Live Demo](#live-demo)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Data Pipeline](#data-pipeline)
+- [Architecture](#architecture)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Overview
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Emergency rooms are overwhelmed and patients often face hours-long waits without knowing faster options nearby. `InstaCare` ships with curated hospital datasets, factors in contextual signals, and lets the community submit updates so families can choose the quickest path to care.
 
-Follow these steps:
+The project took home first place at a regional health-tech hackathon thanks to its patient-centered UX and practical data strategy. Work continues to evolve the prototype using the same data sources included in this repository.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Features
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Predictive wait times:** Combines historical wait-time aggregates with contextual adjustments (traffic, weather, local events) to surface estimates for each facility.
+- **Confidence-aware UI:** Displays confidence scores and factors behind every prediction so medical staff can validate assumptions quickly.
+- **Interactive map:** Renders nearby ERs on Google Maps with color-coded wait-time markers and routing shortcuts.
+- **Crowdsourced verification:** Lets patients anonymously submit actual wait experiences to continuously improve accuracy.
+- **Accessibility-first design:** Built with responsive layouts, keyboard navigation, and mindful color contrast for critical scenarios.
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Live Demo
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- **URL:** https://instant-waitwise.vercel.app/
+
+If you want a private walkthrough or demo credentials, feel free to reach out via Issues or the contact email below.
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript + React 18
+- **UI Toolkit:** Tailwind CSS, shadcn/ui, Radix UI, lucide-react
+- **State/Data:** TanStack Query, React Hook Form, Zod
+- **Maps & Geolocation:** Google Maps JavaScript API
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm 9+ (or pnpm/bun if you prefer)
+- Google Maps JavaScript API key with Maps JavaScript enabled
+
+### Installation
+
+```bash
+git clone https://github.com/<your-org>/InstaCare.git
+cd InstaCare
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:3000` to explore the app.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+Create a `.env.local` file in the project root and set the required keys:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+```
 
-## What technologies are used for this project?
+If you are contributing additional APIs or analytics, document them here as well.
 
-This project is built with .
+## Data & Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The app serves hospital estimates from JSON files in `data/`, backed by the CSV datasets checked into the repo. To regenerate the real-data aggregates:
 
-## How can I deploy this project?
+```bash
+npm run process-real-data
+```
 
-Simply open [Lovable](https://lovable.dev/projects/d5e36d0c-c49f-4400-a308-7168da291142) and click on Share -> Publish.
+This executes `src/scripts/processRealERData.ts`, reading `Real ER Wait Time Dataset.csv` and writing updated `real-processed-visits.json` and `real-hospital-features.json`. Predictions merge those outputs with the synthetic set in `hospital-features.json`, and user feedback is persisted to `data/feedback.json` via the `/api/feedback` route.
 
-## I want to use a custom domain - is that possible?
+## Architecture
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+```
+src/
+├─ app/
+│  ├─ page.tsx               # Marketing landing page
+│  ├─ hospitals/             # Interactive hospital finder + map
+│  └─ report/                # Crowdsourced feedback form
+├─ components/               # Reusable UI primitives and feature blocks
+├─ lib/                      # Data utilities (formatters, helpers)
+├─ utils/                    # Client-side helpers (e.g., location)
+└─ scripts/                  # Data ingestion + transformation scripts
+```
+
+Predictions are currently generated client-side from seeded data, but the interfaces are designed to plug into a live inference API.
+
+## Roadmap
+
+- Integrate live feeds from participating hospital systems
+- Deploy the prediction service as a serverless API endpoint
+- Add SMS/email alerts for status changes
+- Launch pilot programs with EMS partners for field testing
+
+## Contributing
+
+Community contributions are welcome. Please:
+
+- Fork the repo and create a feature branch.
+- Add or update tests where relevant.
+- Run `npm run lint` before opening a pull request.
+- Describe the motivation and UX impact of your change.
+
+## Acknowledgements
+
+- Hackathon organizers and mentors who helped shape the original product vision.
+- Open-source maintainers behind the libraries that power InstaCare.
+
+---
+
+Want to collaborate or explore partnerships? Open an issue or email the maintainers at `team@instacare.health`.
