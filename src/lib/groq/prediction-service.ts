@@ -67,53 +67,66 @@ interface PredictionResult {
  * Generates a prompt for the Groq AI model to predict ER wait times
  */
 function generatePredictionPrompt(input: PredictionInput): string {
-  return `
-You are an expert AI system for predicting emergency room wait times based on historical and real-time data.
+  const currentHour = new Date().getHours();
+  const isPeakHours = (currentHour >= 7 && currentHour <= 10) || (currentHour >= 17 && currentHour <= 20);
+  
+  return `You are an advanced AI healthcare analytics system specializing in emergency room wait time predictions. You use machine learning principles, statistical analysis, and real-time contextual data to provide highly accurate predictions.
 
-HOSPITAL INFORMATION:
-- Name: ${input.hospital.name}
-- Region: ${input.hospital.region}
-- Facility Size: ${input.hospital.facilitySize} beds
-- Nurse-to-Patient Ratio: ${input.hospital.nurseToPatientRatio.toFixed(2)}
-- Specialist Availability: ${input.hospital.specialistAvailability.toFixed(2)}
-- Patient Satisfaction: ${input.hospital.patientSatisfaction.toFixed(2)}/10
-- Total Visit Count in Dataset: ${input.hospital.visitCount}
-${input.hospital.distance ? `- Distance from User: ${input.hospital.distance.toFixed(2)} km` : ''}
+## HOSPITAL PROFILE
+**Facility:** ${input.hospital.name}
+**Location:** ${input.hospital.region}
+**Capacity:** ${input.hospital.facilitySize} beds
+**Staffing Ratio:** ${input.hospital.nurseToPatientRatio.toFixed(2)} nurses per patient (${input.hospital.nurseToPatientRatio < 0.2 ? 'UNDERSTAFFED' : input.hospital.nurseToPatientRatio > 0.35 ? 'WELL-STAFFED' : 'ADEQUATE'})
+**Specialist Coverage:** ${(input.hospital.specialistAvailability * 100).toFixed(0)}% availability
+**Patient Satisfaction Score:** ${input.hospital.patientSatisfaction.toFixed(1)}/10 (${input.hospital.patientSatisfaction >= 8 ? 'Excellent' : input.hospital.patientSatisfaction >= 6 ? 'Good' : 'Needs Improvement'})
+**Historical Data Points:** ${input.hospital.visitCount} visits analyzed
+${input.hospital.distance ? `**Distance from Patient:** ${input.hospital.distance.toFixed(1)} km` : ''}
 
-HISTORICAL WAIT TIME DATA:
-- Overall Average Wait Time: ${input.hospital.averageWaitTimes.overall.toFixed(2)} minutes
-- Average Wait Time for ${input.urgencyLevel} Urgency: ${input.hospital.averageWaitTimes.byUrgency[input.urgencyLevel as keyof typeof input.hospital.averageWaitTimes.byUrgency].toFixed(2)} minutes
-- Average Wait Time during ${input.currentTimeOfDay}: ${input.hospital.averageWaitTimes.byTimeOfDay[input.currentTimeOfDay as keyof typeof input.hospital.averageWaitTimes.byTimeOfDay].toFixed(2)} minutes
-- Average Wait Time during ${input.currentSeason}: ${input.hospital.averageWaitTimes.bySeason[input.currentSeason as keyof typeof input.hospital.averageWaitTimes.bySeason].toFixed(2)} minutes
+## HISTORICAL PATTERNS (Minutes)
+- **Baseline Average:** ${input.hospital.averageWaitTimes.overall.toFixed(0)} min
+- **${input.urgencyLevel} Urgency Cases:** ${input.hospital.averageWaitTimes.byUrgency[input.urgencyLevel as keyof typeof input.hospital.averageWaitTimes.byUrgency].toFixed(0)} min (${((input.hospital.averageWaitTimes.byUrgency[input.urgencyLevel as keyof typeof input.hospital.averageWaitTimes.byUrgency] / input.hospital.averageWaitTimes.overall - 1) * 100).toFixed(0)}% vs baseline)
+- **${input.currentTimeOfDay} Period:** ${input.hospital.averageWaitTimes.byTimeOfDay[input.currentTimeOfDay as keyof typeof input.hospital.averageWaitTimes.byTimeOfDay].toFixed(0)} min
+- **${input.currentSeason} Season:** ${input.hospital.averageWaitTimes.bySeason[input.currentSeason as keyof typeof input.hospital.averageWaitTimes.bySeason].toFixed(0)} min
 
-CURRENT CONDITIONS:
-- Day of Week: ${input.dayOfWeek}
-- Is Weekend: ${input.isWeekend ? 'Yes' : 'No'}
-- Time of Day: ${input.currentTimeOfDay}
+## REAL-TIME CONTEXT
+**Temporal Factors:**
+- Current Day: ${input.dayOfWeek} (${input.isWeekend ? '⚠️ WEEKEND - Expect 15-25% higher volume' : 'Weekday'})
+- Time Period: ${input.currentTimeOfDay} ${isPeakHours ? '⚠️ PEAK HOURS' : ''}
 - Season: ${input.currentSeason}
-${input.trafficCondition ? `- Traffic Condition: ${input.trafficCondition}` : ''}
-${input.weatherCondition ? `- Weather Condition: ${input.weatherCondition}` : ''}
-${input.localEvents && input.localEvents.length > 0 ? `- Local Events: ${input.localEvents.join(', ')}` : ''}
 
-TASK:
-Based on the above information, predict the current wait time in minutes for this hospital's emergency room.
-Provide your prediction as a JSON object with the following structure:
+**External Conditions:**
+${input.trafficCondition ? `- Traffic: ${input.trafficCondition} ${input.trafficCondition === 'Heavy' ? '⚠️ May delay ambulances by 10-20%' : ''}` : ''}
+${input.weatherCondition ? `- Weather: ${input.weatherCondition} ${['Stormy', 'Snowy', 'Rainy'].includes(input.weatherCondition) ? '⚠️ Increases accident-related visits by 15-30%' : ''}` : ''}
+${input.localEvents && input.localEvents.length > 0 ? `- Local Events: ${input.localEvents.join(', ')} ⚠️ May increase ER volume by 20-40%` : '- No major local events'}
+
+## PREDICTION TASK
+Analyze ALL factors above using these principles:
+1. **Base Calculation:** Start with urgency-specific historical average
+2. **Temporal Adjustment:** Apply time-of-day and seasonal multipliers
+3. **Staffing Impact:** Lower nurse ratios increase wait times by 15-30%
+4. **External Factors:** Heavy traffic (+10-15%), severe weather (+15-25%), local events (+20-40%)
+5. **Weekend Effect:** Saturdays/Sundays typically +15-25% due to reduced staffing
+6. **Confidence Scoring:** 
+   - High confidence (0.85-0.95): Large dataset, normal conditions
+   - Medium confidence (0.70-0.84): Limited data or unusual conditions
+   - Low confidence (0.50-0.69): Very limited data or extreme conditions
+
+**Output Format (JSON only, no markdown):**
 {
-  "predictedWaitTime": [number of minutes],
-  "confidenceScore": [number between 0 and 1],
+  "predictedWaitTime": <integer minutes>,
+  "confidenceScore": <0.50-0.95>,
   "factors": {
-    "baseWaitTime": [base wait time in minutes],
-    "timeOfDayFactor": [factor as a decimal],
-    "seasonFactor": [factor as a decimal],
-    "dayOfWeekFactor": [factor as a decimal],
-    "trafficFactor": [factor as a decimal],
-    "weatherFactor": [factor as a decimal],
-    "otherFactors": [array of strings describing other factors]
+    "baseWaitTime": <base urgency wait time>,
+    "timeOfDayFactor": <0.7-1.5 multiplier>,
+    "seasonFactor": <0.8-1.3 multiplier>,
+    "dayOfWeekFactor": <1.0-1.25 multiplier>,
+    "trafficFactor": <1.0-1.2 multiplier>,
+    "weatherFactor": <1.0-1.3 multiplier>,
+    "otherFactors": [<array of key impact descriptions>]
   }
 }
 
-Only respond with the JSON object and no other text.
-`;
+Respond ONLY with valid JSON. No explanations.`;
 }
 
 /**
